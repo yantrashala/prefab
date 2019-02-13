@@ -10,3 +10,10 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+
+#other build directories
+bin
+
+ui/node_modules
+ui/build

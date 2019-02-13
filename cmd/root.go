@@ -28,9 +28,9 @@ var rootCmd = &cobra.Command{
 A tool to get prefabricated production ready code as a starter for your next adventure. 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		var verbose = viper.GetBool("verbose")
+		verbose := viper.GetBool("verbose")
 
-		fmt.Println(Cyan(">>>"), Bold(Blue("prefab")), ">>>")
+		fmt.Println(Gray(">>>"), Bold(Blue("prefab")), Gray(">>>"))
 
 		prompt := promptui.Prompt{
 			Label: "Project Name",

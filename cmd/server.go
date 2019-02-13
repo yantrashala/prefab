@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 
 	. "github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
@@ -17,7 +18,12 @@ var serverCmd = &cobra.Command{
 	Short: "starts the web UI",
 	Long:  `starts a web UI in the specified port (default 9876) for a interactive prefab configuration`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("prefab confuration server running at ", Bold(Green("http://localhost:9876")))
+		var port = viper.GetString("port")
+		fmt.Println(Blue("prefab"), " confuration server running at ", Bold(Green("http://localhost:"+port)))
+		http.Handle("/", http.FileServer(http.Dir("./ui/build")))
+		if err := http.ListenAndServe(":"+port, nil); err != nil {
+			panic(err)
+		}
 	},
 }
 
