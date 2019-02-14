@@ -17,8 +17,8 @@ PID=/tmp/.$(PROJECTNAME).pid
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
 
-## install: Install missing dependencies. Runs `go get` internally. e.g; make install get=github.com/foo/bar
-install: go-get
+## install: Install missing dependencies. Runs `go get && npm install` internally. e.g; make install get=github.com/foo/bar
+install: ui-install go-get
 
 ## start: Start in development mode. Auto-starts when code changes.
 start:
@@ -28,8 +28,8 @@ start:
 stop: stop-server
 
 start-server: stop-server
-	@echo "  >  $(PROJECTNAME) is available at $(ADDR)"
-	@-$(GOBIN)/$(PROJECTNAME) 2>&1 & echo $$! > $(PID)
+	@echo "  >  starting ◤◣ $(PROJECTNAME)..."
+	@-$(GOBIN)/$(PROJECTNAME) server 2>&1 & echo $$! > $(PID)
 	@cat $(PID) | sed "/^/s/^/  \>  PID: /"
 
 stop-server:
@@ -50,14 +50,27 @@ compile:
 	@-rm $(STDERR)
 	@-$(MAKE) -s go-compile 2> $(STDERR)
 	@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*/ /' | sed "/^/s/^/     /" 1>&2
+	@-$(MAKE) -s ui-build 2> $(STDERR)
+	@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*/ /' | sed "/^/s/^/     /" 1>&2
 
 ## exec: Run given command, wrapped with custom GOPATH. e.g; make exec run="go test ./..."
 exec:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) $(run)
 
 ## clean: Clean build files. Runs `go clean` internally.
-clean:
-	@(MAKEFILE) go-clean
+clean: go-clean ui-clean
+
+ui-install:
+	@echo "  >  installing ui dependencies..."
+	@cd ui && npm install
+
+ui-build:
+	@echo "  >  building ui packages..."
+	@cd ui && npm run build
+
+ui-clean:
+	@echo "  >  Cleaning ui cache"
+	@cd ui && rm -rf build
 
 go-compile: go-clean go-get go-build
 
