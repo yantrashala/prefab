@@ -24,13 +24,13 @@ var userLicense string
 var rootCmd = &cobra.Command{
 	Use:   "prefab",
 	Short: "prefab's for your application",
-	Long: `>> fab >>
+	Long: `◤◣ fab ◤◣
 A tool to get prefabricated production ready code as a starter for your next adventure. 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		verbose := viper.GetBool("verbose")
 
-		fmt.Println(Gray(">>>"), Bold(Blue("prefab")), Gray(">>>"))
+		fmt.Println(Gray("\u25E4\u25E3"), Bold(Blue(" prefab ")), Gray("◤◣"))
 
 		prompt := promptui.Prompt{
 			Label: "Project Name",
