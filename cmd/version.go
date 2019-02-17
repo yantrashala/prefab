@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	prefab "github.com/yantrashala/prefab/common"
 )
 
 // versionCmd represents the version command
@@ -14,7 +15,8 @@ var versionCmd = &cobra.Command{
 	Short: "version of the prefab tool",
 	Long:  `version of the prefab tool, in x.y.z format.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("fab version 0.0.1")
+		//prefabInfo := prefab.NewInfo("")
+		fmt.Println(colors.Green(prefab.BuildVersionString()))
 	},
 }
 

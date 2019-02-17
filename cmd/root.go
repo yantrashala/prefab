@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	. "github.com/logrusorgru/aurora"
+	"github.com/logrusorgru/aurora"
 	"github.com/manifoldco/promptui"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -20,6 +20,9 @@ var projectName string
 var projectDir string
 var userLicense string
 
+// colorizer
+var colors aurora.Aurora
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "prefab",
@@ -30,7 +33,7 @@ A tool to get prefabricated production ready code as a starter for your next adv
 	Run: func(cmd *cobra.Command, args []string) {
 		verbose := viper.GetBool("verbose")
 
-		fmt.Println(Gray("\u25E4\u25E3"), Bold(Blue(" prefab ")), Gray("◤◣"))
+		fmt.Println(colors.Gray("\u25E4\u25E3"), colors.Bold(colors.Blue(" prefab ")), colors.Gray("◤◣"))
 
 		prompt := promptui.Prompt{
 			Label: "Project Name",
@@ -52,7 +55,7 @@ A tool to get prefabricated production ready code as a starter for your next adv
 		}
 
 		if verbose == true {
-			fmt.Printf("Creating project %q\n", Bold(Green(projectName)))
+			fmt.Printf("Creating project %q\n", colors.Bold(colors.Green(projectName)))
 		}
 	},
 }
@@ -76,11 +79,13 @@ func init() {
 	rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "Author name for copyright attribution")
 	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "Name of license for the project (can provide `licensetext` in config)")
 	rootCmd.PersistentFlags().Bool("verbose", false, "toogle verbose logging")
+	rootCmd.PersistentFlags().Bool("nocolors", false, "toogle use of colors in cli mode")
 	// rootCmd.PersistentFlags().Bool("viper", true, "Use Viper for configuration")
 
 	viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
 	viper.BindPFlag("projectdir", rootCmd.PersistentFlags().Lookup("projectdir"))
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+	viper.BindPFlag("nocolors", rootCmd.PersistentFlags().Lookup("nocolors"))
 	// viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
 
 	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
@@ -112,4 +117,7 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
+
+	noColors := viper.GetBool("nocolors")
+	colors = aurora.NewAurora(!noColors)
 }

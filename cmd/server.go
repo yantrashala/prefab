@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 
-	. "github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -19,7 +18,7 @@ var serverCmd = &cobra.Command{
 	Long:  `starts a web UI in the specified port (default 9876) for a interactive prefab configuration`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var port = viper.GetString("port")
-		fmt.Println(Blue("prefab"), " confuration server running at ", Bold(Green("http://localhost:"+port)))
+		fmt.Println(colors.Blue("prefab"), " confuration server running at ", colors.Bold(colors.Green("http://localhost:"+port)))
 		http.Handle("/", http.FileServer(http.Dir("./ui/build")))
 		if err := http.ListenAndServe(":"+port, nil); err != nil {
 			panic(err)
