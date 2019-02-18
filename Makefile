@@ -39,7 +39,7 @@ stop-server:
 	@-kill `cat $(PID)` 2> /dev/null || true
 	@-rm $(PID)
 
-## watch: Run given command when code changes. e.g; make watch run="make stop-server go-compile start-server" 
+## watch: Run given command when code changes. e.g; make watch run="make stop-server go-get go-build start-server" 
 ## requires: chokidar, please install it , npm install -g chokidar-cli
 watch:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) chokidar **/*.go --initial -i ui -c "$(run)"
