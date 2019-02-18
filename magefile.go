@@ -265,6 +265,13 @@ func Install() error {
 	return os.Rename("./bin/fab", "/usr/local/bin/fab")
 }
 
+// A step to get and install UI
+func UIGet() {
+	fmt.Println("Installing UI Deps...")
+	cmd := exec.Command("npm", "install")
+	return cmd.Run()
+}
+
 // Get the dependent modules.
 func Get() error {
 	fmt.Println("Installing Deps...")
