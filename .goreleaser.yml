@@ -1,0 +1,66 @@
+project_name: prefab
+build:
+  main: main.go
+  binary: prefab
+  ldflags: -s -w -X github.com/yantrashala/prefab/common/prefab.buildDate={{.Date}} -X github.com/yantrashala/prefab/common/prefab.commitHash={{ .ShortCommit }}
+  env:
+    - CGO_ENABLED=0
+  goos:
+    - darwin
+    - linux
+    - windows
+    - freebsd
+    - netbsd
+    - openbsd
+    - dragonfly
+  goarch:
+    - amd64
+    - 386
+    - arm
+    - arm64
+  goarm:
+    - 7
+nfpm:
+  formats:
+    - deb
+  vendor: "publicissapient"
+  homepage: "https://publicissapient.com/"
+  maintainer: "Rakesh Ravuri <rravurigmail.com>"
+  description: "A Prefabricated production app generator built with love in GoLang."
+  license: "Apache 2.0"
+  name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}"
+  replacements:
+    amd64: 64bit
+    386: 32bit
+    arm: ARM
+    arm64: ARM64
+    darwin: macOS
+    linux: Linux
+    windows: Windows
+    openbsd: OpenBSD
+    netbsd: NetBSD
+    freebsd: FreeBSD
+    dragonfly: DragonFlyBSD
+archive:
+  format: tar.gz
+  format_overrides:
+    - goos: windows
+      format: zip
+  name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}"
+  replacements:
+    amd64: 64bit
+    386: 32bit
+    arm: ARM
+    arm64: ARM64
+    darwin: macOS
+    linux: Linux
+    windows: Windows
+    openbsd: OpenBSD
+    netbsd: NetBSD
+    freebsd: FreeBSD
+    dragonfly: DragonFlyBSD
+  files:
+    - README.md
+    - LICENSE
+release:
+  draft: true

@@ -1,13 +1,45 @@
-# prefab
+# ◤◣ prefab
 A tool to get prefabricated production ready code as a starter for your next adventure.
 
-## Developers getting started
+## Choose How to Install
+If you want to use prefab as your app generator, simply install the prefab binaries. The prefab binaries have no external dependencies.
+
+To contribute to the prefab source code or documentation, you should fork the prefab GitHub project and clone it to your local machine.
+
+Finally, you can install the prefab source code with go, build the binaries yourself, and run prefab that way. Building the binaries is an easy task for an experienced go getter.
+
+TBD: steps to get release binary for different plaform
+
+### Install Hugo as Your Site Generator (Binary Install)
+Use the installation [instructions in the prefab documentation]().
+
+### Build and Install the Binaries from Source (Advanced Install)
+
+#### Prerequisite Tools
+* [git client](https://git-scm.com/)
+* [Go (at least Go 1.11)](https://goland.org/dl)
+
+#### Fetch from GitHub
+Prefab uses the Go Modules support built into Go 1.11 to build. The easiest is to clone prefab in a directory outside of GOPATH, as in the following example:
+
+mkdir $HOME/src
+cd $HOME/src
+git clone https://github.com/yantrashala/prefab.git
+cd prefab
+go run mage.go install
+If you are a Windows user, substitute the $HOME environment variable above with %USERPROFILE%.
+
+## The Prefab Documentation
+
+TBD: links to documentation and tutorials
+
+## Getting started for prefab Developers
 
 ```
 > git clone https://github.com/yantrashala/prefab.git
 ```
 
-Build and run in docker (suggested)
+### Build and run in docker (suggested)
 ```
 > cd prefab
 > docker build -t ps/fab .
@@ -15,23 +47,19 @@ Build and run in docker (suggested)
 > docker run --rm -it -p9876:9876 ps/fab ./fab server
 ```
 
-or if you have prereqs installed locally try
+### or if you have optional prereqs installed locally try
 ```
-> git clone https://github.com/yantrashala/prefab.git
-...
 > cd prefab
 > go get ./
 > cd ui
 > npm install
 > npm run build
 > cd ..
-> go run main.go 
+> go run main.go server 
 ```
 
-or use the make file locally
+### or use the make file locally
 ```
-> git clone https://github.com/yantrashala/prefab.git
-...
 > cd prefab
 > make install
 > make compile
@@ -41,12 +69,34 @@ or use the make file locally
 > make stop-server
 ```
 
+### or use [mage](https://github.com/magefile/mage) locally
+```
+> go get -d github.com/magefile/mage
+> go run $GOPATH/src/github.com/magefile/mage/bootstrap.go install
+> cd prefab
+> mage
 
-### Prerequisites
+```
+
+### or use chokidar for watch and recompile locally
+
+first install chokidar globally (assuming node & npm are alreadt installed)
+```
+> npm install -g chokidar-cli
+```
+
+```
+>cd prefab
+>chokidar **/*.go -c "mage test"
+```
+
+## Prerequisites
 * [git client](https://git-scm.com/)
 * [Docker 17.05 or later](https://www.docker.com/)
-* [go 1.11 or later](https://golang.org/)
-* [node v11 or later](https://nodejs.org)
+
+> Optionally for local development
+>* [go 1.11 or later](https://golang.org/dl)
+>* [node v11 or later](https://nodejs.org)
 
 ## Contributing
 1. Fork it
