@@ -7,6 +7,8 @@ GOBASE=$(shell pwd)
 GOPATH="$(GOBASE)/vendor:$(GOBASE)"
 GOBIN=$(GOBASE)/bin
 GOFILES=$(wildcard *.go)
+GOFILES := $(filter-out mage.go, $(GOFILES))
+GOFILES := $(filter-out magefile.go, $(GOFILES))
 
 # Redirect error output to a file, so we can show it in development mode.
 STDERR=/tmp/.$(PROJECTNAME)-stderr.txt
@@ -37,10 +39,10 @@ stop-server:
 	@-kill `cat $(PID)` 2> /dev/null || true
 	@-rm $(PID)
 
-# go get github.com/azer/yolo
-## watch: Run given command when code changes. e.g; make watch run="echo 'hey'"
+## watch: Run given command when code changes. e.g; make watch run="make stop-server go-compile start-server" 
+## requires: chokidar, please install it , npm install -g chokidar-cli
 watch:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) yolo -i . -e vendor -e bin -e ui -c "$(run)"
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) chokidar **/*.go --initial -i ui -c "$(run)"
 
 restart-server: stop-server start-server
 
@@ -50,7 +52,7 @@ compile:
 	@-rm $(STDERR)
 	@-$(MAKE) -s go-compile 2> $(STDERR)
 	@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*/ /' | sed "/^/s/^/     /" 1>&2
-	@-$(MAKE) -s ui-build 2> $(STDERR)
+	@-$(MAKE) -s ui-compile 2> $(STDERR)
 	@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*/ /' | sed "/^/s/^/     /" 1>&2
 
 ## exec: Run given command, wrapped with custom GOPATH. e.g; make exec run="go test ./..."
@@ -60,7 +62,9 @@ exec:
 ## clean: Clean build files. Runs `go clean` internally.
 clean: go-clean ui-clean
 
-ui-install:
+ui-compile: ui-clean ui-get ui-build
+
+ui-get:
 	@echo "  >  installing ui dependencies..."
 	@cd ui && npm install
 
