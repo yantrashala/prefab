@@ -8,6 +8,7 @@ README.md
 bin
 ui/node_modules
 vendor
+dist
 
 # To prevent storing dev/temporary container data
 *.csv

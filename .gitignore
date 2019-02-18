@@ -15,7 +15,10 @@
 #other build directories
 bin
 prefab
+dist
 
 ui/node_modules
 ui/build
 vendor
+
+.DS_Store
