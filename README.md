@@ -91,7 +91,7 @@ first install chokidar globally (assuming node & npm are alreadt installed)
 ```
 > cd prefab
 > make compile
-> make watch run="make stop-server go-get go-build start-server" &
+> make watch run="make stop-server go-get go-build start-server"
 ...
 ```
 
