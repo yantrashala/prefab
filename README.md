@@ -22,12 +22,14 @@ Use the installation [instructions in the prefab documentation]().
 #### Fetch from GitHub
 Prefab uses the Go Modules support built into Go 1.11 to build. The easiest is to clone prefab in a directory outside of GOPATH, as in the following example:
 
-mkdir $HOME/src
-cd $HOME/src
-git clone https://github.com/yantrashala/prefab.git
-cd prefab
-go run mage.go install
-If you are a Windows user, substitute the $HOME environment variable above with %USERPROFILE%.
+```
+> mkdir $HOME/src
+> cd $HOME/src
+> git clone https://github.com/yantrashala/prefab.git
+> cd prefab
+> go run mage.go install
+```
+If you are a Windows user, substitute the `$HOME` environment variable above with `%USERPROFILE%`.
 
 ## The Prefab Documentation
 
@@ -55,13 +57,13 @@ TBD: links to documentation and tutorials
 > npm install
 > npm run build
 > cd ..
+> go get -d -v
 > go run main.go server 
 ```
 
 ### or use the make file locally
 ```
 > cd prefab
-> make install
 > make compile
 > make start-server
 ...
@@ -74,7 +76,8 @@ TBD: links to documentation and tutorials
 > go get -d github.com/magefile/mage
 > go run $GOPATH/src/github.com/magefile/mage/bootstrap.go install
 > cd prefab
-> mage
+> mage prefab
+>./bin/fab server
 
 ```
 
@@ -86,8 +89,8 @@ first install chokidar globally (assuming node & npm are alreadt installed)
 ```
 
 ```
->cd prefab
->chokidar **/*.go -c "mage test"
+> cd prefab
+> make watch run="make stop-server go-compile start-server"
 ```
 
 ## Prerequisites
