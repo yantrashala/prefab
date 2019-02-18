@@ -2,6 +2,7 @@
   "name": "ui",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:9876",
   "dependencies": {
     "@types/jest": "24.0.3",
     "@types/node": "11.9.3",
