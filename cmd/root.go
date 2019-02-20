@@ -6,19 +6,25 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/logrusorgru/aurora"
 	"github.com/manifoldco/promptui"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/yantrashala/prefab/model"
 )
 
+var verbose bool
 var cfgFile string
 var projectName string
 var projectDir string
 var userLicense string
+var tempDir string
 
 // colorizer
 var colors aurora.Aurora
@@ -27,36 +33,48 @@ var colors aurora.Aurora
 var rootCmd = &cobra.Command{
 	Use:   "prefab",
 	Short: "prefab's for your application",
-	Long: `◤◣ fab ◤◣
+	Long: `◤◣ prefab ◤◣
 A tool to get prefabricated production ready code as a starter for your next adventure. 
 `,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		//projectName = viper.GetString("projectName")
+	},
+	PreRun: func(cmd *cobra.Command, args []string) {
+	},
 	Run: func(cmd *cobra.Command, args []string) {
-		verbose := viper.GetBool("verbose")
 
 		fmt.Println(colors.Gray("\u25E4\u25E3"), colors.Bold(colors.Blue(" prefab ")), colors.Gray("◤◣"))
 
-		prompt := promptui.Prompt{
-			Label: "Project Name",
-			Validate: func(input string) error {
-				if len(input) < 3 {
-					return errors.New("Project name must have at least 3 characters")
-				}
-				return nil
-			},
-		}
-
 		if projectName == "" {
+			prompt := promptui.Prompt{
+				Label:   "Project Name",
+				Default: "project1",
+				Validate: func(input string) error {
+					if len(input) < 3 {
+						return errors.New("Project name must have at least 3 characters")
+					}
+					return nil
+				},
+			}
+
 			pName, err := prompt.Run()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-			projectName = pName
+			model.CurrentProject.SetProjectName(pName)
+		} else {
+			model.CurrentProject.SetProjectName(projectName)
 		}
 
 		if verbose == true {
-			fmt.Printf("Creating project %q\n", colors.Bold(colors.Green(projectName)))
+			fmt.Printf("Creating project %q\n", colors.Bold(colors.Green(model.CurrentProject.Name)))
 		}
+	},
+	PostRun: func(cmd *cobra.Command, args []string) {
+	},
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		defer os.RemoveAll(tempDir)
 	},
 }
 
@@ -72,17 +90,25 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	var err error
+	tempDir, err = ioutil.TempDir("", "prefab")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("temp dir: " + tempDir)
+
 	// persistent flags, global for the application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.prefab.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.prefab/config.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&projectName, "name", "n", "", "name of the project")
-	rootCmd.PersistentFlags().StringVarP(&projectDir, "projectdir", "d", "", "project directory eg. github.com/acme/project")
+	rootCmd.PersistentFlags().StringVarP(&projectDir, "projectdir", "d", tempDir, "project directory eg. /Users/username/.prefab/projects")
 	rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "Author name for copyright attribution")
 	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "Name of license for the project (can provide `licensetext` in config)")
-	rootCmd.PersistentFlags().Bool("verbose", false, "toogle verbose logging")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "toogle verbose logging")
 	rootCmd.PersistentFlags().Bool("nocolors", false, "toogle use of colors in cli mode")
 	// rootCmd.PersistentFlags().Bool("viper", true, "Use Viper for configuration")
 
 	viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
+	viper.BindPFlag("projectName", rootCmd.PersistentFlags().Lookup("name"))
 	viper.BindPFlag("projectdir", rootCmd.PersistentFlags().Lookup("projectdir"))
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 	viper.BindPFlag("nocolors", rootCmd.PersistentFlags().Lookup("nocolors"))
@@ -106,18 +132,23 @@ func initConfig() {
 		}
 
 		// Search config in home directory with name ".prefab" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".prefab")
+		viper.AddConfigPath(filepath.Join(home, ".prefab"))
+		viper.SetConfigName("config.yaml")
 	}
 
 	viper.SetEnvPrefix("fab")
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
+	configerr := viper.ReadInConfig()
 
+	verbose = viper.GetBool("verbose")
 	noColors := viper.GetBool("nocolors")
 	colors = aurora.NewAurora(!noColors)
+
+	if configerr == nil {
+		if verbose {
+			fmt.Println("Using config file: ", colors.Green(viper.ConfigFileUsed()))
+		}
+	}
 }
