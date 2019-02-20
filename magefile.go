@@ -59,7 +59,6 @@ func buildTags() string {
 		return envtags
 	}
 	return "none"
-
 }
 
 // Build prefab binary
@@ -266,7 +265,7 @@ func Install() error {
 }
 
 // A step to get and install UI
-func UIGet() {
+func UIGet() error {
 	fmt.Println("Installing UI Deps...")
 	cmd := exec.Command("npm", "install")
 	return cmd.Run()
