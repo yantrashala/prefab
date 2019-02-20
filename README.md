@@ -58,6 +58,7 @@ TBD: links to documentation and tutorials
 > npm run build
 > cd ..
 > go get -d -v
+> go test ./...
 > go run main.go server 
 ```
 
