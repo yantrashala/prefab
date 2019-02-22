@@ -48,7 +48,7 @@ A tool to get prefabricated production ready code as a starter for your next adv
 		if projectName == "" {
 			pName, err := prompt.Run()
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println(colors.Red("!! error -"), err)
 				os.Exit(1)
 			}
 			projectName = pName
@@ -57,6 +57,7 @@ A tool to get prefabricated production ready code as a starter for your next adv
 		if verbose == true {
 			fmt.Printf("Creating project %q\n", colors.Bold(colors.Green(projectName)))
 		}
+
 	},
 }
 
@@ -64,7 +65,7 @@ A tool to get prefabricated production ready code as a starter for your next adv
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		fmt.Println("!! error -", err)
 		os.Exit(1)
 	}
 }
@@ -94,6 +95,10 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+
+	noColors := viper.GetBool("nocolors")
+	colors = aurora.NewAurora(!noColors)
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
@@ -101,13 +106,14 @@ func initConfig() {
 		// Find home directory.
 		home, err := homedir.Dir()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println(colors.Red("!! error -"), err)
 			os.Exit(1)
 		}
 
 		// Search config in home directory with name ".prefab" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".prefab")
+		viper.SetConfigType("yaml")
 	}
 
 	viper.SetEnvPrefix("fab")
@@ -115,9 +121,10 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		if viper.GetBool("verbose") == true {
+			fmt.Println(">> Using config file:", viper.ConfigFileUsed())
+		}
+	} else {
+		fmt.Println(colors.Red("!! error -"), err)
 	}
-
-	noColors := viper.GetBool("nocolors")
-	colors = aurora.NewAurora(!noColors)
 }

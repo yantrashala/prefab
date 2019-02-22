@@ -11,11 +11,11 @@ import (
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "version of the prefab tool",
-	Long:  `version of the prefab tool, in x.y.z format.`,
+	Annotations: map[string]string{"sequence": "1", "chainable": "false"},
+	Use:         "version",
+	Short:       "version of the prefab tool",
+	Long:        `version of the prefab tool, in x.y.z format.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		//prefabInfo := prefab.NewInfo("")
 		fmt.Println(colors.Green(prefab.BuildVersionString()))
 	},
 }
