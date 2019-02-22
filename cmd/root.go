@@ -25,6 +25,7 @@ var projectName string
 var projectDir string
 var userLicense string
 var tempDir string
+var saveWorkDir bool
 
 // colorizer
 var colors aurora.Aurora
@@ -37,7 +38,9 @@ var rootCmd = &cobra.Command{
 A tool to get prefabricated production ready code as a starter for your next adventure. 
 `,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		//projectName = viper.GetString("projectName")
+		if saveWorkDir {
+			fmt.Println("WORK=" + tempDir)
+		}
 	},
 	PreRun: func(cmd *cobra.Command, args []string) {
 	},
@@ -74,7 +77,9 @@ A tool to get prefabricated production ready code as a starter for your next adv
 	PostRun: func(cmd *cobra.Command, args []string) {
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		defer os.RemoveAll(tempDir)
+		if saveWorkDir == false {
+			defer os.RemoveAll(tempDir)
+		}
 	},
 }
 
@@ -95,7 +100,6 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("temp dir: " + tempDir)
 
 	// persistent flags, global for the application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.prefab/config.yaml)")
@@ -105,8 +109,10 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "Name of license for the project (can provide `licensetext` in config)")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "toogle verbose logging")
 	rootCmd.PersistentFlags().Bool("nocolors", false, "toogle use of colors in cli mode")
-	// rootCmd.PersistentFlags().Bool("viper", true, "Use Viper for configuration")
+	rootCmd.PersistentFlags().BoolVarP(&saveWorkDir, "work", "w", false, "print the name of the temporary work directory and do not delete it when exiting.")
 
+	// rootCmd.PersistentFlags().Bool("viper", true, "Use Viper for configuration")
+	viper.BindPFlag("work", rootCmd.PersistentFlags().Lookup("work"))
 	viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
 	viper.BindPFlag("projectName", rootCmd.PersistentFlags().Lookup("name"))
 	viper.BindPFlag("projectdir", rootCmd.PersistentFlags().Lookup("projectdir"))
