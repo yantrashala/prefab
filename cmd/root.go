@@ -30,6 +30,40 @@ var saveWorkDir bool
 // colorizer
 var colors aurora.Aurora
 
+func setProjectName() {
+	if projectName == "" {
+		prompt := promptui.Prompt{
+			Label:   "Project Name",
+			Default: "project1",
+			Validate: func(input string) error {
+				if len(input) < 3 {
+					return errors.New("Project name must have at least 3 characters")
+				}
+				return nil
+			},
+		}
+
+		pName, err := prompt.Run()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		model.CurrentProject.SetProjectName(pName)
+	} else {
+		model.CurrentProject.SetProjectName(projectName)
+	}
+
+	if verbose == true {
+		fmt.Printf("Creating project %q\n", colors.Bold(colors.Green(model.CurrentProject.Name)))
+	}
+}
+
+func createEnvironment(name string) {
+	env := model.Environment{Name: name}
+	model.CurrentProject.AddEnvironment(env)
+	fmt.Println(model.CurrentProject)
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "prefab",
@@ -48,31 +82,9 @@ A tool to get prefabricated production ready code as a starter for your next adv
 
 		fmt.Println(colors.Gray("\u25E4\u25E3"), colors.Bold(colors.Blue(" prefab ")), colors.Gray("◤◣"))
 
-		if projectName == "" {
-			prompt := promptui.Prompt{
-				Label:   "Project Name",
-				Default: "project1",
-				Validate: func(input string) error {
-					if len(input) < 3 {
-						return errors.New("Project name must have at least 3 characters")
-					}
-					return nil
-				},
-			}
+		setProjectName()
 
-			pName, err := prompt.Run()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-			model.CurrentProject.SetProjectName(pName)
-		} else {
-			model.CurrentProject.SetProjectName(projectName)
-		}
-
-		if verbose == true {
-			fmt.Printf("Creating project %q\n", colors.Bold(colors.Green(model.CurrentProject.Name)))
-		}
+		createEnvironment("build")
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {
 	},

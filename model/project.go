@@ -10,6 +10,8 @@ type Project struct {
 	Name           string
 	PID            uint32
 	LocalDirectory string
+	Environments   map[string]Environment
+	Connections    map[string]Connection
 }
 
 // SetProjectName Validates and Sets the projectName
@@ -30,9 +32,18 @@ func (p *Project) SetLocalDirectory(path string) error {
 	return nil
 }
 
+// AddEnvironment Validates and adds to teh Environment collection
+func (p *Project) AddEnvironment(env Environment) error {
+	//TODO: validate environment
+	p.Environments[env.Name] = env
+	return nil
+}
+
 // CurrentProject values
 var CurrentProject *Project
 
 func init() {
-	CurrentProject = &Project{}
+	envs := make(map[string]Environment)
+	conns := make(map[string]Connection)
+	CurrentProject = &Project{Environments: envs, Connections: conns}
 }
