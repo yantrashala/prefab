@@ -31,7 +31,7 @@ func (i Info) Version() VersionString {
 	return CurrentVersion.Version()
 }
 
-// NewInfo creates a new Hugo Info object.
+// NewInfo creates a new prefab Info object.
 func NewInfo(environment string) Info {
 	if environment == "" {
 		environment = EnvironmentProduction

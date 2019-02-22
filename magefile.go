@@ -40,6 +40,15 @@ func init() {
 }
 
 func flagEnv() map[string]string {
+	_, err := ioutil.ReadDir(".git")
+	if os.IsNotExist(err) {
+		return map[string]string{
+			"PACKAGE":     packageName,
+			"COMMIT_HASH": "",
+			"BUILD_DATE":  time.Now().Format("2006-01-02T15:04:05Z0700"),
+		}
+	}
+
 	hash, _ := sh.Output("git", "rev-parse", "--short", "HEAD")
 	return map[string]string{
 		"PACKAGE":     packageName,
@@ -59,7 +68,6 @@ func buildTags() string {
 		return envtags
 	}
 	return "none"
-
 }
 
 // Build prefab binary
@@ -79,18 +87,7 @@ var docker = sh.RunCmd("docker")
 
 // Build prefab Docker container
 func Docker() error {
-	if err := docker("build", "-t", "prefab", "."); err != nil {
-		return err
-	}
-	// yes ignore errors here
-	docker("rm", "-f", "prefab-build")
-	if err := docker("run", "--name", "prefab-build", "prefab server"); err != nil {
-		return err
-	}
-	if err := docker("cp", "prefab-build:/go/bin/prefab", "."); err != nil {
-		return err
-	}
-	return docker("rm", "prefab-build")
+	return docker("build", "-t", "prefab-build", ".")
 }
 
 // Run tests and linters
@@ -266,7 +263,7 @@ func Install() error {
 }
 
 // A step to get and install UI
-func UIGet() {
+func UIGet() error {
 	fmt.Println("Installing UI Deps...")
 	cmd := exec.Command("npm", "install")
 	return cmd.Run()

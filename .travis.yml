@@ -1,0 +1,24 @@
+# safelist
+branches:
+  only:
+  - master
+  - stable
+language: go
+go:
+- 1.11.x
+
+install:
+  - mkdir -p $HOME/src
+  - mv $HOME/gopath/src/github.com/yantrashala/prefab $HOME/src
+  - export TRAVIS_BUILD_DIR=$HOME/src/prefab
+  - cd $HOME/src/prefab
+  - go get github.com/magefile/mage
+script:
+  - go mod download
+  - mage -v test
+  - mage -v check
+  - mage -v prefab
+  - df -h
+
+before_install:
+  - df -h

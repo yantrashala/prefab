@@ -24,7 +24,7 @@ install: ui-install go-get
 
 ## start: Start in development mode. Auto-starts when code changes.
 start:
-    bash -c "trap 'make stop' EXIT; $(MAKE) compile start-server watch run='make compile start-server'"
+	bash -c "trap 'make stop' EXIT; $(MAKE) compile start-server watch run='make compile start-server'"
 
 ## stop: Stop development mode.
 stop: stop-server
