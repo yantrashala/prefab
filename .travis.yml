@@ -1,3 +1,9 @@
+# safelist
+branches:
+  only:
+  - master
+  - stable
 language: go
 go:
 - 1.11.x
+script: go run mage.go test
