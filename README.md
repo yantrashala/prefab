@@ -10,10 +10,9 @@ To contribute to the prefab source code or documentation, you should fork the pr
 
 Finally, you can install the prefab source code with go, build the binaries yourself, and run prefab that way. Building the binaries is an easy task for an experienced go getter.
 
-TBD: steps to get release binary for different plaform
-
-### Install Hugo as Your Site Generator (Binary Install)
+### Install *prefab* as Your Site Generator (Binary Install)
 Use the installation [instructions in the prefab documentation]().
+TBD: steps to get release binary for different plaform
 
 ### Build and Install the Binaries from Source (Advanced Install)
 
@@ -33,11 +32,11 @@ Prefab uses the Go Modules support built into Go 1.11 to build. The easiest is t
 ```
 If you are a Windows user, substitute the `$HOME` environment variable above with `%USERPROFILE%`.
 
-## The Prefab Documentation
+## The *prefab* Documentation
 
 TBD: links to documentation and tutorials
 
-## Getting started for prefab Developers
+## Getting started for *prefab* Developers
 
 ```
 > git clone https://github.com/yantrashala/prefab.git
