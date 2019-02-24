@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import './App.css';
-
+import Home from './components/Home';
+import GetStarted from './components/configure/GetStarted';
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <h1>&#x25E4;&#x25E3;</h1>
-          <h2>
-            prefab
-          </h2>
-          <small>fastest way to get started</small>
-        </header>
+      <div className="container">
+        <BrowserRouter>
+          <Switch>
+            <Route path="/" component={Home} exact />
+            <Route path="/configure" component={GetStarted} />
+          </Switch>
+        </BrowserRouter>
       </div>
     );
   }

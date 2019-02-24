@@ -4,12 +4,15 @@
   "private": true,
   "proxy": "http://localhost:9876",
   "dependencies": {
+    "@material-ui/core": "^3.9.2",
+    "@material-ui/styles": "^3.0.0-alpha.10",
     "@types/jest": "24.0.3",
     "@types/node": "11.9.3",
     "@types/react": "16.8.2",
     "@types/react-dom": "16.8.0",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
+    "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.5",
     "typescript": "3.3.3"
   },
@@ -27,5 +30,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "@types/react-router-dom": "^4.3.1"
+  }
 }
