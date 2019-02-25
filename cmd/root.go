@@ -58,10 +58,35 @@ func setProjectName() {
 	}
 }
 
-func createEnvironment(name string) {
-	env := model.Environment{Name: name}
+func createBuildEnvironment() {
+	if verbose {
+		fmt.Println("Creating build environment...")
+	}
+
+	i, _ := model.GetBuildEnvironmentTypes()
+	prompt := promptui.Select{
+		Label: "Select the build environment type",
+		Items: i,
+	}
+	_, t, _ := prompt.Run()
+	if verbose {
+		fmt.Println("build environment type: ", t)
+	}
+
+	env := model.Environment{Name: "build", Type: t}
 	model.CurrentProject.AddEnvironment(env)
-	fmt.Println(model.CurrentProject)
+}
+
+func createEnvironment() {
+	envNamePrompt := promptui.Prompt{
+		Label: "Name of the environment",
+	}
+	envName, _ := envNamePrompt.Run()
+	env := model.Environment{Name: envName}
+	model.CurrentProject.AddEnvironment(env)
+	if verbose {
+		fmt.Println("Creating environment: ", envName)
+	}
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -84,11 +109,24 @@ A tool to get prefabricated production ready code as a starter for your next adv
 
 		setProjectName()
 
-		createEnvironment("build")
+		createBuildEnvironment()
+
+		promptText := "Do you want a create a new run environment? [y/N]"
+
+		prompt := promptui.Select{
+			Label: promptText,
+			Items: []string{"y", "N"},
+		}
+		_, option, _ := prompt.Run()
+		for option == "y" {
+			createEnvironment()
+			_, option, _ = prompt.Run()
+		}
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		fmt.Println(model.CurrentProject)
 		if saveWorkDir == false {
 			defer os.RemoveAll(tempDir)
 		}
