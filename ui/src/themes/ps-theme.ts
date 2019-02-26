@@ -3,12 +3,16 @@ import { TextField } from '@material-ui/core';
 
 const theme = createMuiTheme({
   palette: {
-    primary: { main: '#ff9999' },
+    type: 'dark',
+    primary: { main: '#fe414d' },
     secondary: { main: '#11cb5f' }
   },
+
+  //-- Still need to get the component specific overides to work
   overrides: {
-    MuiFormControl: {
+    MuiInput: {
       root: {
+        width: '450px',
         marginNormal: { main: '45px' }
       }
     }

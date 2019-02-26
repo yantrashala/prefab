@@ -12,12 +12,14 @@ a:hover {
 }
 .container {
   width: 1150px;
-  margin: 0 auto;
+  margin: 5px auto 0;
 }
 .App {
   text-align: center;
 }
-
+ht {
+  border: thin solid #eee;
+}
 .title {
   font-size: 28px;
 }
@@ -31,7 +33,8 @@ h1 {
 }
 .textField {
   margin: 5px 55px;
-  text-color: '#eee';
+  color: '#eee';
+  width: '450px';
 }
 .App-logo {
   animation: App-logo-spin infinite 20s linear;

@@ -11,10 +11,10 @@ const Home = () => {
         <h1>&#x25E4;&#x25E3;</h1>
         <h2>prefab</h2>
         <small>fastest way to get started</small>
-        <Button variant="outlined" color="primary">
-          Get started
-        </Button>
-        <Link to="/configure">Get Started</Link>
+
+        <Link to="/configure/get-started">
+          <small>Get Started</small>
+        </Link>
       </header>
     </MuiThemeProvider>
   );

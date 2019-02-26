@@ -12,10 +12,10 @@ const MicroservicesSetup = (props: any) => {
     <MuiThemeProvider theme={psTheme}>
       <h1>Microservice Setup</h1>
       <form className="form-container">
-        <TextField id="project-id" label="Project ID" margin="normal" className="textField" variant="filled" />
-        <TextField id="project-name" label="Project Name" margin="normal" className="textField" variant="filled" />
-        <TextField id="engineering-lead" label="Engineering Lead Name" margin="normal" className="textField" variant="filled" />
-        <TextField id="jira-url" label="Jira URL" margin="normal" className="textField" variant="filled" />
+        <TextField fullWidth color="secondary" id="project-id" label="Project ID" margin="normal" className="textField" variant="filled" />
+        <TextField fullWidth id="project-name" label="Project Name" margin="normal" className="textField" variant="filled" />
+        <TextField fullWidth id="engineering-lead" label="Engineering Lead Name" margin="normal" className="textField" variant="filled" />
+        <TextField fullWidth id="jira-url" label="Jira URL" margin="normal" className="textField" variant="filled" />
         <Button variant="contained" color="primary">
           Setup Project & Continue{' '}
         </Button>
