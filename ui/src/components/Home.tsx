@@ -12,8 +12,8 @@ const Home = () => {
         <h2>prefab</h2>
         <small>fastest way to get started</small>
 
-        <Link to="/configure/get-started">
-          <small>Get Started</small>
+        <Link to="/configure/project-setup">
+          <small>Get Started ></small>
         </Link>
       </header>
     </MuiThemeProvider>

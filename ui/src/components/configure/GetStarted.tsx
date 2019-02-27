@@ -10,7 +10,7 @@ class GetStarted extends Component {
   render() {
     return (
       <Grid container spacing={24}>
-        <Grid item>
+        <Grid item md={12}>
           <Header />
         </Grid>
         <Grid item>
