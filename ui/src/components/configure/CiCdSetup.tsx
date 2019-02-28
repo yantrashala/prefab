@@ -43,6 +43,12 @@ const CiCdSetup = (props: any) => {
   const [logging, setLogging] = useState('elk');
   const [qualityReport, setQualityReport] = useState('speedy');
   const [codeReview, setCodeReview] = useState('crucible');
+
+
+  const onLoggingChange = (event:any) => setLogging(event.target.value);
+  const onQualityReportChange = (event:any) => setQualityReport(event.target.value);
+  
+
   return (
     <MuiThemeProvider theme={psTheme}>
       <h1>CI-CD Setup</h1>
@@ -69,21 +75,31 @@ const CiCdSetup = (props: any) => {
           <FormControlLabel control={<Checkbox value="Staging" />} label="Staging" />
           <FormControlLabel control={<Checkbox value="Production" />} label="Production" />
         </FormGroup>
-        <FormLabel>Select the logging Framework</FormLabel>
+        
         <FormGroup row />
-        <RadioGroup aria-label="Logging" name="logging" value={logging} onChange={() => setLogging}>
-          <FormGroup row>
-            <FormControlLabel value="elk" control={<Radio />} label="ELK" />
-            <FormControlLabel value="efk" control={<Radio />} label="EFK" />
-          </FormGroup>
-          <FormLabel>Locatin for your Engineering Quality Results</FormLabel>
-        </RadioGroup>
-        <RadioGroup aria-label="quality-reports" name="quality-reports" value={qualityReport} onChange={() => setQualityReport(qualityReport)}>
-          <FormGroup row>
+       
+        <FormLabel>Select the logging Framework</FormLabel>
+        <RadioGroup
+            aria-label="Logging"
+            name="logging"
+            value={logging}
+            onChange={onLoggingChange}
+          >
+           <FormControlLabel value="elk" control={<Radio />} label="ELK" />
+           <FormControlLabel value="efk" control={<Radio />} label="EFK" />
+
+          </RadioGroup>
+
+        <FormGroup row />
+        <FormLabel>Location for your Engineering Quality Results</FormLabel>
+        
+        <RadioGroup aria-label="quality-reports" name="quality-reports" value={qualityReport} onChange={onQualityReportChange}>
+        
             <FormControlLabel value="speedy" control={<Radio />} label="Speedy" />
             <FormControlLabel value="s3" control={<Radio />} label="S3" />
-          </FormGroup>
+        
         </RadioGroup>
+
 
         <TextField
           id="code-reviews"
