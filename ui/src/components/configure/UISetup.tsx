@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Button from '@material-ui/core/Button';
 import { MuiThemeProvider, withStyles } from '@material-ui/core/styles';
 import psTheme from '../../themes/ps-theme';
@@ -20,19 +20,19 @@ const frameworks = [
 
 const jsLanguages = [
   {
-    value: 'es6',
-    label: 'JavaScript-ES6+'
-  },
-  {
     value: 'ts',
     label: 'TypeScript'
+  },
+  {
+    value: 'es6',
+    label: 'JavaScript-ES6+'
   }
 ];
 
 const cssStyles = [
   {
     value: 'scss',
-    label: 'SAS/SCSS'
+    label: 'SASS/SCSS'
   },
   {
     value: 'styled-components',
@@ -44,26 +44,23 @@ const cssStyles = [
   }
 ];
 
-
-const renderMenuOption = (options:any) => {
-  return options.map((option:any) => (
+const renderMenuOption = (options: any) => {
+  return options.map((option: any) => (
     <MenuItem key={option.value} value={option.value}>
       {option.label}
     </MenuItem>
-  ))
-}
-
+  ));
+};
 
 const UISetup = (props: any) => {
   const [architecture, setArchitecture] = useState('csr');
-  const [jsLanguage, setJsLanguage] = useState('es6');
-  const [cssStyle, setCssStyle] = useState('scss');
+  const [jsLanguage, setJsLanguage] = useState('ts');
+  const [cssStyle, setCssStyle] = useState('styled-components');
   const { classes } = props;
 
-
-  const onArchitectureChange = (event:any) => setArchitecture(event.target.value);
-  const onJSLanguageChange = (event:any) => setJsLanguage(event.target.value);
-  const onStylingOptionChange = (event:any) => setCssStyle(event.target.value);
+  const onArchitectureChange = (event: any) => setArchitecture(event.target.value);
+  const onJSLanguageChange = (event: any) => setJsLanguage(event.target.value);
+  const onStylingOptionChange = (event: any) => setCssStyle(event.target.value);
 
   return (
     <MuiThemeProvider theme={psTheme}>
@@ -75,7 +72,7 @@ const UISetup = (props: any) => {
           fullWidth
           label="Select your UI Architecture"
           value={architecture}
-          onChange={React.useCallback(onArchitectureChange, [])}
+          onChange={useCallback(onArchitectureChange, [])}
           margin="normal"
         >
           {renderMenuOption(frameworks)}
@@ -86,11 +83,10 @@ const UISetup = (props: any) => {
           fullWidth
           label="Select JavaScript Language"
           value={jsLanguage}
-          onChange={React.useCallback(onJSLanguageChange, [])}
+          onChange={useCallback(onJSLanguageChange, [])}
           margin="normal"
         >
           {renderMenuOption(jsLanguages)}
-          
         </TextField>
         <TextField
           id="css-styles"
@@ -98,11 +94,11 @@ const UISetup = (props: any) => {
           fullWidth
           label="Select Styling Options"
           value={cssStyle}
-          onChange={React.useCallback(onStylingOptionChange, [])}
+          onChange={useCallback(onStylingOptionChange, [])}
           helperText="Please select Styling Options"
           margin="normal"
         >
-        {renderMenuOption(cssStyles)}
+          {renderMenuOption(cssStyles)}
         </TextField>
 
         <Button variant="contained" color="primary">

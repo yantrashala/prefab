@@ -15,6 +15,13 @@ const theme = createMuiTheme({
         width: '450px',
         marginNormal: { main: '45px' }
       }
+    },
+
+    MuiFormControl: {
+      root: {
+        marginTop: '15px',
+        marginBottom: '15px'
+      }
     }
   }
 });
