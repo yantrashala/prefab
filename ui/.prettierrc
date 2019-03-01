@@ -1,0 +1,5 @@
+{
+  "ignorePath": ".prettierignore",
+  "singleQuote": true,
+  "printWidth": 150
+}
