@@ -9,7 +9,7 @@ import (
 func TestGenerateNames(t *testing.T) {
 	assert := require.New(t)
 	a := []string{"aa"}
-	n := []string{"nn", "na", "an"}
+	n := []string{"nn"}
 
 	r := generateName(a, n, false)
 	assert.Equal(r, a[0]+"-"+n[0])
