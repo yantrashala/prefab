@@ -14,6 +14,8 @@ func TestGenerateNames(t *testing.T) {
 	r := generateName(a, n, false)
 	assert.Equal(r, a[0]+"-"+n[0])
 
-	r = generateName(a, n, true)
-	assert.Equal(r, a[0]+"-"+n[2])
+	ad := []string{"aa"}
+	no := []string{"nn", "na", "an"}
+	r = generateName(ad, no, true)
+	assert.Equal(r, "aa-an")
 }
