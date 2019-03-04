@@ -3,6 +3,8 @@ package model
 import (
 	"errors"
 	"io/ioutil"
+
+	prefab "github.com/yantrashala/prefab/common"
 )
 
 // Project parameters
@@ -45,5 +47,6 @@ var CurrentProject *Project
 func init() {
 	envs := make(map[string]Environment)
 	conns := make(map[string]Connection)
-	CurrentProject = &Project{Environments: envs, Connections: conns}
+	name := prefab.GenerateName(false)
+	CurrentProject = &Project{Name: name, Environments: envs, Connections: conns}
 }
