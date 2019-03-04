@@ -4,12 +4,55 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/yantrashala/prefab/model"
 )
+
+type server struct {
+	router *mux.Router
+}
+
+// Server struct
+var Server *server
+
+func (s *server) ListenAndServe(port string) error {
+	return http.ListenAndServe(":"+port, Server.router)
+}
+
+func (s *server) routes() {
+	s.router.Handle("/", http.FileServer(http.Dir("./ui/build")))
+	s.router.HandleFunc("/api/project/name", s.handleGetName()).Methods("GET")
+	s.router.HandleFunc("/api/environments/build", s.handleGetBuildEnvironments()).Methods("GET")
+}
+
+func (s *server) handleGetName() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(model.CurrentProject.Name)
+	}
+}
+
+func (s *server) handleGetBuildEnvironments() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		l, err := model.GetBuildEnvironmentTypes()
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(err)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(l)
+	}
+}
 
 // serverCmd represents the server command
 var serverCmd = &cobra.Command{
@@ -19,14 +62,16 @@ var serverCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var port = viper.GetString("port")
 		fmt.Println(colors.Blue("prefab"), " confuration server running at ", colors.Bold(colors.Green("http://localhost:"+port)))
-		http.Handle("/", http.FileServer(http.Dir("./ui/build")))
-		if err := http.ListenAndServe(":"+port, nil); err != nil {
+		if err := Server.ListenAndServe(port); err != nil {
 			panic(err)
 		}
 	},
 }
 
 func init() {
+	Server = &server{router: mux.NewRouter()}
+	Server.routes()
+
 	rootCmd.AddCommand(serverCmd)
 
 	// Here you will define your flags and configuration settings.
