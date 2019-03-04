@@ -32,9 +32,12 @@ var colors aurora.Aurora
 
 func setProjectName() {
 	if projectName == "" {
+		if verbose == true {
+			fmt.Println("Creating new project ...")
+		}
 		prompt := promptui.Prompt{
 			Label:   "Project Name",
-			Default: "project1",
+			Default: model.CurrentProject.Name,
 			Validate: func(input string) error {
 				if len(input) < 3 {
 					return errors.New("Project name must have at least 3 characters")
@@ -52,10 +55,6 @@ func setProjectName() {
 	} else {
 		model.CurrentProject.SetProjectName(projectName)
 	}
-
-	if verbose == true {
-		fmt.Printf("Creating project %q\n", colors.Bold(colors.Green(model.CurrentProject.Name)))
-	}
 }
 
 func createBuildEnvironment() {
@@ -63,30 +62,38 @@ func createBuildEnvironment() {
 		fmt.Println("Creating build environment...")
 	}
 
-	i, _ := model.GetBuildEnvironmentTypes()
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\U0001F449 {{ .Name | cyan }}",
+		Inactive: "  {{ .Name | blue }}",
+		Selected: "Build environment: {{ .Name | green | bold}}",
+		Details: `
+--------- Build Environment ----------
+{{ "Name:" | faint }}	{{ .Name }}
+{{ "Repo:" | faint }}	{{ .Repo }}`,
+	}
+	el, _ := model.GetBuildEnvironmentTypes()
 	prompt := promptui.Select{
-		Label: "Select the build environment type",
-		Items: i,
+		Templates: templates,
+		Label:     "Select the build environment type",
+		Items:     el,
 	}
-	_, t, _ := prompt.Run()
-	if verbose {
-		fmt.Println("build environment type: ", t)
-	}
-
-	env := model.Environment{Name: "build", Type: t}
+	i, _, _ := prompt.Run()
+	env := model.Environment(el[i])
+	env.Type = "build"
 	model.CurrentProject.AddEnvironment(env)
 }
 
 func createEnvironment() {
+	if verbose {
+		fmt.Println("Create new environment ...")
+	}
 	envNamePrompt := promptui.Prompt{
 		Label: "Name of the environment",
 	}
 	envName, _ := envNamePrompt.Run()
 	env := model.Environment{Name: envName}
 	model.CurrentProject.AddEnvironment(env)
-	if verbose {
-		fmt.Println("Creating environment: ", envName)
-	}
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -113,9 +120,17 @@ A tool to get prefabricated production ready code as a starter for your next adv
 
 		promptText := "Do you want a create a new run environment? [y/N]"
 
+		templates := &promptui.SelectTemplates{
+			Label:    "{{ . }}?",
+			Active:   "\U0001F449 {{ . | cyan }}",
+			Inactive: "  {{ . | blue }}",
+			Selected: " ",
+		}
+
 		prompt := promptui.Select{
-			Label: promptText,
-			Items: []string{"y", "N"},
+			Templates: templates,
+			Label:     promptText,
+			Items:     []string{"y", "N"},
 		}
 		_, option, _ := prompt.Run()
 		for option == "y" {
