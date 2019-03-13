@@ -36,7 +36,7 @@ func setProjectName() {
 			fmt.Println("Creating new project ...")
 		}
 		prompt := promptui.Prompt{
-			Label:   "Project Name",
+			Label:   "Project Name: ",
 			Default: model.CurrentProject.Name,
 			Validate: func(input string) error {
 				if len(input) < 3 {
@@ -89,7 +89,7 @@ func createEnvironment() {
 		fmt.Println("Create new environment ...")
 	}
 	envNamePrompt := promptui.Prompt{
-		Label: "Name of the environment",
+		Label: "Name of the environment: ",
 	}
 	envName, _ := envNamePrompt.Run()
 	env := model.Environment{Name: envName}
