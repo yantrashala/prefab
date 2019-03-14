@@ -27,9 +27,10 @@ func (s *server) ListenAndServe(port string) error {
 
 func (s *server) routes() {
 	fs := http.FileServer(http.Dir("./ui/build"))
-	s.router.PathPrefix("/").Handler(http.StripPrefix("/", fs))
+
 	s.router.HandleFunc("/api/project/name", s.handleGetName()).Methods("GET")
 	s.router.HandleFunc("/api/environments/build", s.handleGetBuildEnvironments()).Methods("GET")
+	s.router.PathPrefix("/").Handler(http.StripPrefix("/", fs))
 }
 
 func (s *server) handleGetName() http.HandlerFunc {
