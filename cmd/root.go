@@ -4,19 +4,25 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/logrusorgru/aurora"
 	"github.com/manifoldco/promptui"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	prefab "github.com/yantrashala/prefab/common"
 	"github.com/yantrashala/prefab/model"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport/client"
+	githttp "gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 )
 
 var verbose bool
@@ -25,7 +31,7 @@ var projectName string
 var projectDir string
 var userLicense string
 var tempDir string
-var saveWorkDir bool
+var saveWorkDir = true
 
 // colorizer
 var colors aurora.Aurora
@@ -33,7 +39,7 @@ var colors aurora.Aurora
 func setProjectName() {
 	if projectName == "" {
 		if verbose == true {
-			fmt.Println("Creating new project ...")
+			fmt.Println(colors.Gray("Creating new project ..."))
 		}
 		prompt := promptui.Prompt{
 			Label:   "Project Name",
@@ -57,9 +63,21 @@ func setProjectName() {
 	}
 }
 
+func setProjectDir() {
+	if projectDir == "" {
+
+	}
+
+	if verbose == true {
+		fmt.Println(colors.Gray("Project directory: "), colors.Green(projectDir))
+	}
+
+	model.CurrentProject.SetLocalDirectory(projectDir)
+}
+
 func createBuildEnvironment() {
 	if verbose {
-		fmt.Println("Creating build environment...")
+		fmt.Println(colors.Gray("Creating build environment..."))
 	}
 
 	templates := &promptui.SelectTemplates{
@@ -70,7 +88,8 @@ func createBuildEnvironment() {
 		Details: `
 --------- Build Environment ----------
 {{ "Name:" | faint }}	{{ .Name }}
-{{ "Repo:" | faint }}	{{ .Repo }}`,
+{{ "Repo:" | faint }}	{{ .Repo }}
+{{ .Summary }}`,
 	}
 	el, _ := model.GetBuildEnvironmentTypes()
 	prompt := promptui.Select{
@@ -80,6 +99,7 @@ func createBuildEnvironment() {
 	}
 	i, _, _ := prompt.Run()
 	env := model.Environment(el[i])
+	env.Name = "build"
 	env.Type = "build"
 	model.CurrentProject.AddEnvironment(env)
 }
@@ -96,6 +116,97 @@ func createEnvironment() {
 	model.CurrentProject.AddEnvironment(env)
 }
 
+func createRuntimeEnvironments() {
+	promptText := "Do you want a create a new run environment? [y/N]"
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\U0001F449 {{ . | cyan }}",
+		Inactive: "  {{ . | blue }}",
+		Selected: " ",
+	}
+
+	prompt := promptui.Select{
+		Templates: templates,
+		Label:     promptText,
+		Items:     []string{"y", "N"},
+	}
+	_, option, _ := prompt.Run()
+	for option == "y" {
+		createEnvironment()
+		_, option, _ = prompt.Run()
+	}
+}
+
+func createApplication() {
+	atypes, _ := model.GetApplicationTypes()
+	prompt := promptui.Select{
+		Label: "Select the Application type",
+		Items: atypes,
+	}
+	i, _, _ := prompt.Run()
+	appType := atypes[i]
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\U0001F449 {{ .Name | cyan }}",
+		Inactive: "  {{ .Name | blue }}",
+		Selected: "Build environment: {{ .Name | green | bold}}",
+		Details: `
+--------- New Application ----------
+{{ "Name:" | faint }}	{{ .Name }}
+{{ "Repo:" | faint }}	{{ .Repo }}
+{{ .Summary }}`,
+	}
+	el := model.GetApplications(appType)
+	prompt = promptui.Select{
+		Templates: templates,
+		Label:     "Select the Application",
+		Items:     el,
+	}
+	i, _, _ = prompt.Run()
+	app := model.Application(el[i])
+
+	label := appType + " Application Name"
+	promptName := promptui.Prompt{
+		Label:   label,
+		Default: prefab.GetSimpleName(),
+		Validate: func(input string) error {
+			if len(input) < 3 {
+				return errors.New("Application name must have at least 3 characters")
+			}
+			return nil
+		},
+	}
+
+	pName, perr := promptName.Run()
+	if perr != nil {
+		fmt.Println(perr)
+		os.Exit(1)
+	}
+	app.Name = pName
+	model.CurrentProject.AddApplication(app)
+}
+
+func createApplications() {
+	promptText := "Do you want a create a new application? [y/N]"
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\U0001F449 {{ . | cyan }}",
+		Inactive: "  {{ . | blue }}",
+		Selected: " ",
+	}
+
+	prompt := promptui.Select{
+		Templates: templates,
+		Label:     promptText,
+		Items:     []string{"y", "N"},
+	}
+	_, option, _ := prompt.Run()
+	for option == "y" {
+		createApplication()
+		_, option, _ = prompt.Run()
+	}
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "prefab",
@@ -104,44 +215,32 @@ var rootCmd = &cobra.Command{
 A tool to get prefabricated production ready code as a starter for your next adventure. 
 `,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		if saveWorkDir {
-			fmt.Println("WORK=" + tempDir)
-		}
+		/*
+			if saveWorkDir {
+				fmt.Println("WORK=" + tempDir)
+			}
+		*/
 	},
 	PreRun: func(cmd *cobra.Command, args []string) {
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 
-		fmt.Println(colors.Gray("\u25E4\u25E3"), colors.Bold(colors.Blue(" prefab ")), colors.Gray("◤◣"))
+		fmt.Println(colors.Gray("\u25E4\u25E3"), colors.Bold(colors.Blue(" prefab"))) //, colors.Gray("◤◣"))
 
 		setProjectName()
 
+		setProjectDir()
+
 		createBuildEnvironment()
 
-		promptText := "Do you want a create a new run environment? [y/N]"
+		createApplications()
 
-		templates := &promptui.SelectTemplates{
-			Label:    "{{ . }}?",
-			Active:   "\U0001F449 {{ . | cyan }}",
-			Inactive: "  {{ . | blue }}",
-			Selected: " ",
-		}
-
-		prompt := promptui.Select{
-			Templates: templates,
-			Label:     promptText,
-			Items:     []string{"y", "N"},
-		}
-		_, option, _ := prompt.Run()
-		for option == "y" {
-			createEnvironment()
-			_, option, _ = prompt.Run()
-		}
+		createRuntimeEnvironments()
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		fmt.Println(model.CurrentProject)
+		model.CurrentProject.SaveProject()
 		if saveWorkDir == false {
 			defer os.RemoveAll(tempDir)
 		}
@@ -158,6 +257,26 @@ func Execute() {
 }
 
 func init() {
+
+	// Create a custom http(s) client with your config
+	customClient := &http.Client{
+		// accept any certificate (might be useful for testing)
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+
+		// 15 second timeout
+		Timeout: 15 * time.Second,
+
+		// don't follow redirect
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	// Override http(s) default protocol to use our custom client
+	client.InstallProtocol("https", githttp.NewClient(customClient))
+
 	cobra.OnInitialize(initConfig)
 
 	var err error
@@ -169,12 +288,12 @@ func init() {
 	// persistent flags, global for the application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.prefab/config.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&projectName, "name", "n", "", "name of the project")
-	rootCmd.PersistentFlags().StringVarP(&projectDir, "projectdir", "d", tempDir, "project directory eg. /Users/username/.prefab/projects")
+	rootCmd.PersistentFlags().StringVarP(&projectDir, "projectdir", "d", projectDir, "project directory eg. /Users/username/.prefab/projects")
 	rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "Author name for copyright attribution")
 	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "Name of license for the project (can provide `licensetext` in config)")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "toogle verbose logging")
 	rootCmd.PersistentFlags().Bool("nocolors", false, "toogle use of colors in cli mode")
-	rootCmd.PersistentFlags().BoolVarP(&saveWorkDir, "work", "w", false, "print the name of the temporary work directory and do not delete it when exiting.")
+	// rootCmd.PersistentFlags().BoolVarP(&saveWorkDir, "work", "w", false, "print the name of the temporary work directory and do not delete it when exiting.")
 
 	// rootCmd.PersistentFlags().Bool("viper", true, "Use Viper for configuration")
 	viper.BindPFlag("work", rootCmd.PersistentFlags().Lookup("work"))
@@ -191,20 +310,24 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	// Find home directory.
+	home, err := homedir.Dir()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
 		// Search config in home directory with name ".prefab" (without extension).
 		viper.AddConfigPath(filepath.Join(home, ".prefab"))
 		viper.SetConfigName("config.yaml")
+	}
+
+	if projectDir == "" {
+		projectDir = filepath.Join(home, ".prefab", "projects")
 	}
 
 	viper.SetEnvPrefix("fab")

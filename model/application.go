@@ -9,17 +9,17 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Environment describes a build or a run environment
-type Environment struct {
+// Application describes a template of the app repo
+type Application struct {
 	Name    string
 	Type    string
 	Repo    string
 	Summary string
 }
 
-func getEnvironmentTypes() (map[string][]Environment, error) {
+func getApplicationTypes() (map[string][]Application, error) {
 
-	url := "https://raw.githubusercontent.com/yantrashala/prefab-config/master/environments.yaml"
+	url := "https://raw.githubusercontent.com/yantrashala/prefab-config/master/apps.yaml"
 	defaultTransport := http.DefaultTransport.(*http.Transport)
 
 	// Create new Transport that ignores self-signed SSL TODO: find a better way
@@ -44,39 +44,38 @@ func getEnvironmentTypes() (map[string][]Environment, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	m := make(map[string][]Environment)
+	m := make(map[string][]Application)
 
 	err = yaml.Unmarshal([]byte(e), &m)
 
 	return m, err
 }
 
-// GetBuildEnvironmentTypes returns a list of supported environment types
-func GetBuildEnvironmentTypes() ([]Environment, error) {
-	m, err := getEnvironmentTypes()
-	var environments []Environment
+// GetApplicationTypes returns a list of applications types
+func GetApplicationTypes() ([]string, error) {
+	m, err := getApplicationTypes()
+	var appTypes []string
 	for k := range m {
-		if k == "build" {
-			repos := m[k]
-			for r := range repos {
-				environments = append(environments, repos[r])
-			}
-		}
+		appTypes = append(appTypes, k)
 	}
-	return environments, err
+	return appTypes, err
 }
 
-// GetRuntimeEnvironmentTypes returns a list of supported environment types
-func GetRuntimeEnvironmentTypes() ([]Environment, error) {
-	m, err := getEnvironmentTypes()
-	var environments []Environment
+// GetApplications returns a list of applications of the specified types
+func GetApplications(appType string) []Application {
+	var apps []Application
+	m, err := getApplicationTypes()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for k := range m {
-		if k == "runtime" {
+		if k == appType {
 			repos := m[k]
 			for r := range repos {
-				environments = append(environments, repos[r])
+				apps = append(apps, repos[r])
 			}
 		}
 	}
-	return environments, err
+	return apps
 }

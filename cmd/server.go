@@ -27,9 +27,10 @@ func (s *server) ListenAndServe(port string) error {
 
 func (s *server) routes() {
 	fs := http.FileServer(http.Dir("./ui/build"))
-	s.router.PathPrefix("/").Handler(http.StripPrefix("/", fs))
 	s.router.HandleFunc("/api/project/name", s.handleGetName()).Methods("GET")
 	s.router.HandleFunc("/api/environments/build", s.handleGetBuildEnvironments()).Methods("GET")
+	s.router.HandleFunc("/api/environments/runtime", s.handleGetRuntimeEnvironments()).Methods("GET")
+	s.router.PathPrefix("/").Handler(http.StripPrefix("/", fs))
 }
 
 func (s *server) handleGetName() http.HandlerFunc {
@@ -44,6 +45,21 @@ func (s *server) handleGetBuildEnvironments() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		l, err := model.GetBuildEnvironmentTypes()
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(err)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(l)
+	}
+}
+
+func (s *server) handleGetRuntimeEnvironments() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		l, err := model.GetRuntimeEnvironmentTypes()
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

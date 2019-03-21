@@ -11,6 +11,12 @@ func GenerateName(alliterative bool) string {
 	return generateName(AdjectivesList, NounList, alliterative)
 }
 
+// GetSimpleName returns a random noun
+func GetSimpleName() string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	return string(NounList[r.Intn(len(NounList))])
+}
+
 func generateName(adjectives []string, nouns []string, alliterative bool) string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	a := adjectives[r.Intn(len(adjectives))]

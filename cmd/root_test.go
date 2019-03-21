@@ -4,6 +4,8 @@
 package cmd
 
 import (
+	"os"
+	"path"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -14,16 +16,20 @@ func TestRootCmd_NameFlag(t *testing.T) {
 	assert := require.New(t)
 
 	projectName = ""
-	rootCmd.SetArgs([]string{"-n", "projectx"})
+	rootCmd.SetArgs([]string{"-n", ".testprojectx"})
 	rootCmd.Execute()
-	assert.Equal("projectx", projectName, "-n argument sets the projectname property")
-	assert.Equal("projectx", model.CurrentProject.Name, "-n argument sets the CurrentProject.Name property")
+	assert.Equal(".testprojectx", projectName, "-n argument sets the projectname property")
+	assert.Equal(".testprojectx", model.CurrentProject.Name, "-n argument sets the CurrentProject.Name property")
+
+	defer os.RemoveAll(path.Join(model.CurrentProject.LocalDirectory, ".testprojectx"))
 
 	projectName = ""
-	rootCmd.SetArgs([]string{"--name", "projectxyz"})
+	rootCmd.SetArgs([]string{"--name", ".testprojectxyz"})
 	rootCmd.Execute()
-	assert.Equal("projectxyz", projectName, "--name argument sets the projectname property")
-	assert.Equal("projectxyz", model.CurrentProject.Name, "--name argument sets the CurrentProject.Name property")
+	assert.Equal(".testprojectxyz", projectName, "--name argument sets the projectname property")
+	assert.Equal(".testprojectxyz", model.CurrentProject.Name, "--name argument sets the CurrentProject.Name property")
+
+	defer os.RemoveAll(path.Join(model.CurrentProject.LocalDirectory, ".testprojectxyz"))
 
 	/* TODO: get this test case to pass
 	os.Setenv("FAB_PROJECTNAME", "envprojectx")
