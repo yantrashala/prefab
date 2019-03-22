@@ -11,10 +11,12 @@ import (
 
 // Application describes a template of the app repo
 type Application struct {
-	Name    string
-	Type    string
-	Repo    string
-	Summary string
+	Name           string
+	Type           string
+	Repo           string
+	Summary        string
+	Config         map[string]string
+	LocalDirectory string
 }
 
 func getApplicationTypes() (map[string][]Application, error) {

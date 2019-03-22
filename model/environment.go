@@ -11,10 +11,12 @@ import (
 
 // Environment describes a build or a run environment
 type Environment struct {
-	Name    string
-	Type    string
-	Repo    string
-	Summary string
+	Name           string
+	Type           string
+	Repo           string
+	Summary        string
+	LocalDirectory string
+	Config         map[string]string
 }
 
 func getEnvironmentTypes() (map[string][]Environment, error) {
@@ -22,7 +24,8 @@ func getEnvironmentTypes() (map[string][]Environment, error) {
 	url := "https://raw.githubusercontent.com/yantrashala/prefab-config/master/environments.yaml"
 	defaultTransport := http.DefaultTransport.(*http.Transport)
 
-	// Create new Transport that ignores self-signed SSL TODO: find a better way
+	// Create new Transport that ignores self-signed SSL
+	// TODO: find a better way
 	tr := &http.Transport{
 		Proxy:                 defaultTransport.Proxy,
 		DialContext:           defaultTransport.DialContext,
@@ -44,6 +47,8 @@ func getEnvironmentTypes() (map[string][]Environment, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// TODO: read into generic struct (m := make(map[interface{}]interface{})) and then transform to env
 	m := make(map[string][]Environment)
 
 	err = yaml.Unmarshal([]byte(e), &m)
@@ -59,6 +64,7 @@ func GetBuildEnvironmentTypes() ([]Environment, error) {
 		if k == "build" {
 			repos := m[k]
 			for r := range repos {
+				repos[r].Config = make(map[string]string)
 				environments = append(environments, repos[r])
 			}
 		}
@@ -74,6 +80,7 @@ func GetRuntimeEnvironmentTypes() ([]Environment, error) {
 		if k == "runtime" {
 			repos := m[k]
 			for r := range repos {
+				repos[r].Config = make(map[string]string)
 				environments = append(environments, repos[r])
 			}
 		}

@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 
 	prefab "github.com/yantrashala/prefab/common"
 	"gopkg.in/src-d/go-git.v4"
@@ -43,9 +44,6 @@ func (p *Project) SetLocalDirectory(path string) error {
 
 // AddEnvironment Validates and adds to teh Environment collection
 func (p *Project) AddEnvironment(env Environment) error {
-	//TODO: validate environment
-	p.Environments[env.Name] = env
-
 	envdir := path.Join(p.LocalDirectory, p.Name, "environments", env.Name)
 	//TODO: validate path
 
@@ -57,14 +55,18 @@ func (p *Project) AddEnvironment(env Environment) error {
 	}); err != nil {
 		log.Fatalf("error: %v", err)
 	}
+
+	env.LocalDirectory = envdir
+	//TODO: validate environment
+	p.Environments[env.Name] = env
+
+	defer os.RemoveAll(path.Join(envdir, ".git"))
+
 	return nil
 }
 
 // AddApplication Validates and adds to teh Environment collection
 func (p *Project) AddApplication(app Application) error {
-	//TODO: validate environment
-	p.Applications[app.Name] = app
-
 	appdir := path.Join(p.LocalDirectory, p.Name, "apps", app.Name)
 	//TODO: validate path
 
@@ -76,7 +78,30 @@ func (p *Project) AddApplication(app Application) error {
 	}); err != nil {
 		log.Fatalf("error: %v", err)
 	}
+
+	app.LocalDirectory = appdir
+	//TODO: validate environment
+	p.Applications[app.Name] = app
+
+	defer os.RemoveAll(path.Join(appdir, ".git"))
+
 	return nil
+}
+
+// ApplyValues will subsitute any go templates
+func (p *Project) ApplyValues() error {
+	err := filepath.Walk(".",
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			fmt.Println(path, info.Size())
+			return nil
+		})
+	if err != nil {
+		log.Println(err)
+	}
+	return err
 }
 
 // SaveProject will the save the vales in the project struct

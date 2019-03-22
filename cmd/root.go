@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"time"
 
@@ -23,6 +24,7 @@ import (
 	"github.com/yantrashala/prefab/model"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/client"
 	githttp "gopkg.in/src-d/go-git.v4/plumbing/transport/http"
+	"gopkg.in/yaml.v2"
 )
 
 var verbose bool
@@ -75,6 +77,37 @@ func setProjectDir() {
 	model.CurrentProject.SetLocalDirectory(projectDir)
 }
 
+func promptForConfigValues(dir string, configValues map[string]string) error {
+
+	content, ferr := ioutil.ReadFile(path.Join(dir, ".prefab", "config.yaml"))
+	if os.IsNotExist(ferr) {
+		return nil
+	}
+
+	config := make(map[string]map[string]string)
+
+	err := yaml.Unmarshal([]byte(content), &config)
+
+	for k := range config {
+		cdata := config[k]
+		configValues[k] = cdata["default"]
+		cprompt := promptui.Prompt{
+			Label:   cdata["prompt"],
+			Default: cdata["default"],
+		}
+
+		if cvalue, cerr := cprompt.Run(); cerr == nil {
+			configValues[k] = cvalue
+		} else {
+			fmt.Println(cerr)
+		}
+
+	}
+
+	return err
+
+}
+
 func createBuildEnvironment() {
 	if verbose {
 		fmt.Println(colors.Gray("Creating build environment..."))
@@ -102,6 +135,14 @@ func createBuildEnvironment() {
 	env.Name = "build"
 	env.Type = "build"
 	model.CurrentProject.AddEnvironment(env)
+
+	envDir := model.CurrentProject.Environments["build"].LocalDirectory
+
+	cerr := promptForConfigValues(envDir, model.CurrentProject.Environments["build"].Config)
+
+	if cerr != nil {
+		log.Fatal(cerr)
+	}
 }
 
 func createEnvironment() {
@@ -166,6 +207,7 @@ func createApplication() {
 	app := model.Application(el[i])
 
 	label := appType + " Application Name"
+
 	promptName := promptui.Prompt{
 		Label:   label,
 		Default: prefab.GetSimpleName(),
