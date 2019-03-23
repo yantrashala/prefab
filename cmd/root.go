@@ -282,6 +282,7 @@ A tool to get prefabricated production ready code as a starter for your next adv
 	PostRun: func(cmd *cobra.Command, args []string) {
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		model.CurrentProject.ApplyValues()
 		model.CurrentProject.SaveProject()
 		if saveWorkDir == false {
 			defer os.RemoveAll(tempDir)

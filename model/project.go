@@ -8,6 +8,8 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
+	"text/template"
 
 	prefab "github.com/yantrashala/prefab/common"
 	"gopkg.in/src-d/go-git.v4"
@@ -88,20 +90,82 @@ func (p *Project) AddApplication(app Application) error {
 	return nil
 }
 
+type tdata struct {
+	Config map[string]string
+	Project
+}
+
 // ApplyValues will subsitute any go templates
-func (p *Project) ApplyValues() error {
-	err := filepath.Walk(".",
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			fmt.Println(path, info.Size())
-			return nil
-		})
-	if err != nil {
-		log.Println(err)
+func (p *Project) ApplyValues() {
+	// projectPath := path.Join(p.LocalDirectory, p.Name)
+	for env := range p.Environments {
+		envDir := p.Environments[env].LocalDirectory
+		err := filepath.Walk(envDir,
+			func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				// fmt.Println(path, info.Size())
+				if info.IsDir() {
+					return nil
+				}
+
+				if contents, ferr := ioutil.ReadFile(path); ferr == nil {
+					// Create a new template and parse the letter into it.
+					t := template.Must(template.New("temp").Parse(string(contents)))
+
+					if out, oerr := os.Create(path); oerr == nil {
+						data := tdata{Config: p.Environments[env].Config, Project: *p}
+						t.Execute(out, data)
+						defer out.Close()
+					}
+				} else {
+					fmt.Println(ferr)
+				}
+
+				return nil
+			})
+		if err != nil {
+			log.Println(err)
+		}
 	}
-	return err
+
+	for app := range p.Applications {
+		appDir := p.Applications[app].LocalDirectory
+		err := filepath.Walk(appDir,
+			func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				//fmt.Println(path, info.Size())
+				if info.IsDir() {
+					return nil
+				}
+
+				i := strings.LastIndex(strings.ToLower(path), ".override")
+
+				if i == -1 {
+					return nil
+				}
+
+				if contents, ferr := ioutil.ReadFile(path); ferr == nil {
+					// Create a new template and parse the letter into it.
+					t := template.Must(template.New("temp").Parse(string(contents)))
+
+					if out, oerr := os.Create(path[:i]); oerr == nil {
+						data := tdata{Config: p.Applications[app].Config, Project: *p}
+						t.Execute(out, data)
+						defer out.Close()
+					}
+				} else {
+					fmt.Println(ferr)
+				}
+				return nil
+			})
+		if err != nil {
+			log.Println(err)
+		}
+	}
 }
 
 // SaveProject will the save the vales in the project struct

@@ -32,6 +32,7 @@ func TestRootCmd_NameFlag(t *testing.T) {
 	defer os.RemoveAll(path.Join(model.CurrentProject.LocalDirectory, ".testprojectxyz"))
 
 	/* TODO: get this test case to pass
+
 	os.Setenv("FAB_PROJECTNAME", "envprojectx")
 	projectName = ""
 	rootCmd.SetArgs([]string{})
