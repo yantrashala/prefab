@@ -110,11 +110,17 @@ func (p *Project) ApplyValues() {
 					return nil
 				}
 
+				i := strings.LastIndex(strings.ToLower(path), ".ptmpl")
+
+				if i == -1 {
+					return nil
+				}
+
 				if contents, ferr := ioutil.ReadFile(path); ferr == nil {
 					// Create a new template and parse the letter into it.
 					t := template.Must(template.New("temp").Parse(string(contents)))
 
-					if out, oerr := os.Create(path); oerr == nil {
+					if out, oerr := os.Create(path[:i]); oerr == nil {
 						data := tdata{Config: p.Environments[env].Config, Project: *p}
 						t.Execute(out, data)
 						defer out.Close()
@@ -142,7 +148,7 @@ func (p *Project) ApplyValues() {
 					return nil
 				}
 
-				i := strings.LastIndex(strings.ToLower(path), ".override")
+				i := strings.LastIndex(strings.ToLower(path), ".ptmpl")
 
 				if i == -1 {
 					return nil
