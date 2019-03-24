@@ -226,6 +226,14 @@ func createApplication() {
 	}
 	app.Name = pName
 	model.CurrentProject.AddApplication(app)
+
+	appDir := model.CurrentProject.Applications[pName].LocalDirectory
+
+	cerr := promptForConfigValues(appDir, model.CurrentProject.Applications[pName].Config)
+
+	if cerr != nil {
+		log.Fatal(cerr)
+	}
 }
 
 func createApplications() {

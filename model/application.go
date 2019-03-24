@@ -75,6 +75,7 @@ func GetApplications(appType string) []Application {
 		if k == appType {
 			repos := m[k]
 			for r := range repos {
+				repos[r].Config = make(map[string]string)
 				apps = append(apps, repos[r])
 			}
 		}
