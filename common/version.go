@@ -3,7 +3,6 @@ package prefab
 import (
 	"fmt"
 
-	"runtime"
 	"strings"
 
 	"github.com/spf13/cast"
@@ -105,27 +104,6 @@ func (v Version) NextPatchLevel(level int) Version {
 	return Version{Number: v.Number - 0.01, PatchLevel: level}
 }
 
-// BuildVersionString creates a version string. This is what you see when
-// running "prefab version".
-func BuildVersionString() string {
-	program := "prefab "
-
-	version := "v" + CurrentVersion.String()
-	if commitHash != "" {
-		version += "-" + strings.ToUpper(commitHash)
-	}
-
-	osArch := runtime.GOOS + "/" + runtime.GOARCH
-
-	date := buildDate
-	if date == "" {
-		date = "unknown"
-	}
-
-	return fmt.Sprintf("%s %s %s BuildDate: %s", program, version, osArch, date)
-
-}
-
 func version(version float32, patchVersion int, suffix string) string {
 	if patchVersion > 0 || version > 0.53 {
 		return fmt.Sprintf("%.2f.%d%s", version, patchVersion, suffix)
@@ -134,11 +112,11 @@ func version(version float32, patchVersion int, suffix string) string {
 }
 
 // CompareVersion compares the given version string or number against the
-// running prefab version.
+// given version.
 // It returns -1 if the given version is less than, 0 if equal and 1 if greater than
 // the running version.
-func CompareVersion(version interface{}) int {
-	return compareVersionsWithSuffix(CurrentVersion.Number, CurrentVersion.PatchLevel, CurrentVersion.Suffix, version)
+func CompareVersion(cv Version, version interface{}) int {
+	return compareVersionsWithSuffix(cv.Number, cv.PatchLevel, cv.Suffix, version)
 }
 
 func compareVersions(inVersion float32, inPatchVersion int, in interface{}) int {

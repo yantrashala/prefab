@@ -9,7 +9,6 @@ import (
 	"github.com/yantrashala/prefab/model"
 
 	"github.com/spf13/cobra"
-	prefab "github.com/yantrashala/prefab/common"
 )
 
 var cName string
@@ -20,7 +19,7 @@ var configCmd = &cobra.Command{
 	Short: "manage confguration values for the prefab tool",
 	Run: func(cmd *cobra.Command, args []string) {
 		//prefabInfo := prefab.NewInfo("")
-		fmt.Println(colors.Green(prefab.BuildVersionString()))
+		fmt.Println(colors.Green(BuildVersionString()))
 	},
 }
 
