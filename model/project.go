@@ -12,7 +12,9 @@ import (
 	"text/template"
 
 	prefab "github.com/yantrashala/prefab/common"
+	"gopkg.in/src-d/go-billy.v4/osfs"
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/storage/filesystem"
 	"gopkg.in/yaml.v2"
 )
 
@@ -23,7 +25,6 @@ type Project struct {
 	LocalDirectory string
 	Environments   map[string]Environment
 	Applications   map[string]Application
-	Connections    map[string]Connection
 }
 
 // SetProjectName Validates and Sets the projectName
@@ -37,9 +38,6 @@ func (p *Project) SetProjectName(name string) error {
 
 // SetLocalDirectory Validates and Sets the local path where the generated files will be placed.
 func (p *Project) SetLocalDirectory(path string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.MkdirAll(path, os.ModePerm)
-	}
 	p.LocalDirectory = path
 	return nil
 }
@@ -62,7 +60,11 @@ func (p *Project) AddEnvironment(env Environment) error {
 	//TODO: validate environment
 	p.Environments[env.Name] = env
 
-	defer os.RemoveAll(path.Join(envdir, ".git"))
+	os.RemoveAll(path.Join(envdir, ".git"))
+
+	fs := osfs.New(path.Join(envdir, ".git"))
+	fss := filesystem.NewStorage(fs, nil)
+	git.Init(fss, fs)
 
 	return nil
 }
@@ -85,8 +87,11 @@ func (p *Project) AddApplication(app Application) error {
 	//TODO: validate environment
 	p.Applications[app.Name] = app
 
-	defer os.RemoveAll(path.Join(appdir, ".git"))
+	os.RemoveAll(path.Join(appdir, ".git"))
 
+	fs := osfs.New(path.Join(appdir, ".git"))
+	fss := filesystem.NewStorage(fs, nil)
+	git.Init(fss, fs)
 	return nil
 }
 
@@ -174,18 +179,36 @@ func (p *Project) ApplyValues() {
 	}
 }
 
+// GetProjectFilename gets the full path of the project settings file
+func (p *Project) GetProjectFilename() string {
+	return path.Join(p.LocalDirectory, p.Name, "project.yaml")
+}
+
 // SaveProject will the save the vales in the project struct
 func (p *Project) SaveProject() error {
-	projectFileName := path.Join(p.LocalDirectory, p.Name, "project.yaml")
+	ppath := path.Join(p.LocalDirectory, p.Name)
+	if _, err := os.Stat(ppath); os.IsNotExist(err) {
+		os.MkdirAll(ppath, os.ModePerm)
+	}
 	d, err := yaml.Marshal(p)
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		return err
 	}
 
-	fmt.Println("Writing project to: ", projectFileName)
-	fmt.Printf("--- project dump:\n%s\n\n", string(d))
-	err = ioutil.WriteFile(projectFileName, d, 0644)
+	err = ioutil.WriteFile(p.GetProjectFilename(), d, 0644)
 	return err
+}
+
+// LoadProject based on name and LocalDirectory
+func (p *Project) LoadProject() error {
+	if content, err := ioutil.ReadFile(p.GetProjectFilename()); err == nil {
+		pdata := Project{}
+		yaml.Unmarshal(content, &pdata)
+		p.PID = pdata.PID
+		p.Environments = pdata.Environments
+		p.Applications = pdata.Applications
+	}
+	return nil
 }
 
 // CurrentProject values
@@ -194,7 +217,6 @@ var CurrentProject *Project
 func init() {
 	apps := make(map[string]Application)
 	envs := make(map[string]Environment)
-	conns := make(map[string]Connection)
 	name := prefab.GenerateName(false)
-	CurrentProject = &Project{Name: name, Environments: envs, Applications: apps, Connections: conns}
+	CurrentProject = &Project{Name: name, Environments: envs, Applications: apps}
 }

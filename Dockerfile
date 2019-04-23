@@ -1,4 +1,4 @@
-FROM golang:1.11 as gobuild
+FROM golang:1.12 as gobuild
 
 RUN go get -d github.com/magefile/mage
 WORKDIR  $GOPATH/src/github.com/magefile/mage

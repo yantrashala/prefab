@@ -17,6 +17,7 @@ type Environment struct {
 	Summary        string
 	LocalDirectory string
 	Config         map[string]string
+	SCM
 }
 
 func getEnvironmentTypes() (map[string][]Environment, error) {

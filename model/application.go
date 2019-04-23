@@ -17,6 +17,7 @@ type Application struct {
 	Summary        string
 	Config         map[string]string
 	LocalDirectory string
+	SCM
 }
 
 func getApplicationTypes() (map[string][]Application, error) {

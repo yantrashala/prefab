@@ -13,6 +13,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"time"
 
 	"github.com/logrusorgru/aurora"
@@ -37,6 +38,26 @@ var saveWorkDir = true
 
 // colorizer
 var colors aurora.Aurora
+
+func promptForYN(question string) (string, error) {
+	promptText := question + " [y/N]"
+	templates := &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\U0001F449 {{ . | cyan }}",
+		Inactive: "  {{ . | blue }}",
+		Selected: " ",
+	}
+
+	prompt := promptui.Select{
+		Templates: templates,
+		Label:     promptText,
+		Items:     []string{"y", "N"},
+	}
+
+	_, option, err := prompt.Run()
+
+	return option, err
+}
 
 func setProjectName() {
 	if projectName == "" {
@@ -108,7 +129,21 @@ func promptForConfigValues(dir string, configValues map[string]string) error {
 
 }
 
-func createBuildEnvironment() {
+func createBuildEnvironment(p bool) error {
+
+	var err error
+	var option string
+
+	if p {
+		if option, err = promptForYN("Do you want a create a new build environment?"); err != nil {
+			return err
+		}
+
+		if option == "N" {
+			return nil
+		}
+	}
+
 	if verbose {
 		fmt.Println(colors.Gray("Creating build environment..."))
 	}
@@ -125,12 +160,17 @@ func createBuildEnvironment() {
 {{ .Summary }}`,
 	}
 	el, _ := model.GetBuildEnvironmentTypes()
-	prompt := promptui.Select{
+	sprompt := promptui.Select{
 		Templates: templates,
 		Label:     "Select the build environment type",
 		Items:     el,
 	}
-	i, _, _ := prompt.Run()
+	i, _, serr := sprompt.Run()
+
+	if serr != nil {
+		return serr
+	}
+
 	env := model.Environment(el[i])
 	env.Name = "build"
 	env.Type = "build"
@@ -141,8 +181,12 @@ func createBuildEnvironment() {
 	cerr := promptForConfigValues(envDir, model.CurrentProject.Environments["build"].Config)
 
 	if cerr != nil {
-		log.Fatal(cerr)
+		return cerr
 	}
+
+	createRepo()
+
+	return nil
 }
 
 func createEnvironment() {
@@ -154,30 +198,47 @@ func createEnvironment() {
 	}
 	envName, _ := envNamePrompt.Run()
 	env := model.Environment{Name: envName}
+
 	model.CurrentProject.AddEnvironment(env)
 }
 
-func createRuntimeEnvironments() {
-	promptText := "Do you want a create a new run environment? [y/N]"
-	templates := &promptui.SelectTemplates{
-		Label:    "{{ . }}?",
-		Active:   "\U0001F449 {{ . | cyan }}",
-		Inactive: "  {{ . | blue }}",
-		Selected: " ",
+func createRuntimeEnvironments(p bool, l bool) error {
+	var err error
+	var option string
+
+	if p {
+		if option, err = promptForYN("Do you want a create a new run environment?"); err != nil {
+			return err
+		}
+
 	}
 
-	prompt := promptui.Select{
-		Templates: templates,
-		Label:     promptText,
-		Items:     []string{"y", "N"},
-	}
-	_, option, _ := prompt.Run()
 	for option == "y" {
 		createEnvironment()
-		_, option, _ = prompt.Run()
+		if !l {
+			return nil
+		}
+		if option, err = promptForYN("Do you want a create a new run environment?"); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
+func createRepo() model.SCM {
+	stypes := model.GetSCMTypes()
+	prompt := promptui.Select{
+		Label: "Select the GIT server",
+		Items: stypes,
+	}
+	i, _, _ := prompt.Run()
+	scmType := stypes[i]
+	fmt.Print(scmType)
+	scm := model.SCM{
+		Type: scmType,
+	}
+	return scm
+}
 func createApplication() {
 	atypes, _ := model.GetApplicationTypes()
 	prompt := promptui.Select{
@@ -237,23 +298,11 @@ func createApplication() {
 }
 
 func createApplications() {
-	promptText := "Do you want a create a new application? [y/N]"
-	templates := &promptui.SelectTemplates{
-		Label:    "{{ . }}?",
-		Active:   "\U0001F449 {{ . | cyan }}",
-		Inactive: "  {{ . | blue }}",
-		Selected: " ",
-	}
 
-	prompt := promptui.Select{
-		Templates: templates,
-		Label:     promptText,
-		Items:     []string{"y", "N"},
-	}
-	_, option, _ := prompt.Run()
+	option, _ := promptForYN("Do you want a create a new application?")
 	for option == "y" {
 		createApplication()
-		_, option, _ = prompt.Run()
+		option, _ = promptForYN("Do you want a create a new application?")
 	}
 }
 
@@ -270,6 +319,27 @@ A tool to get prefabricated production ready code as a starter for your next adv
 				fmt.Println("WORK=" + tempDir)
 			}
 		*/
+
+		if verbose {
+			fmt.Println("Reading default config from: ", colors.Green(cfgFile))
+		}
+		err := model.LoadConfig(cfgFile)
+		if err != nil {
+			if verbose {
+				fmt.Println("WARNING: ", err)
+			}
+		}
+
+		if projectName != "" {
+			model.CurrentProject.SetProjectName(projectName)
+		}
+
+		if projectDir != "" {
+			fmt.Println("Setting project directory: ", colors.Green(projectDir))
+			model.CurrentProject.SetLocalDirectory(projectDir)
+			model.CurrentProject.LoadProject()
+		}
+
 	},
 	PreRun: func(cmd *cobra.Command, args []string) {
 	},
@@ -281,17 +351,37 @@ A tool to get prefabricated production ready code as a starter for your next adv
 
 		setProjectDir()
 
-		createBuildEnvironment()
+		model.CurrentProject.LoadProject()
+
+		createBuildEnvironment(true)
 
 		createApplications()
 
-		createRuntimeEnvironments()
+		createRuntimeEnvironments(true, true)
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		model.CurrentProject.SaveProject()
+		var err error
+		if verbose {
+			fmt.Println("Writing project to: ", model.CurrentProject.GetProjectFilename())
+		}
+		err = model.CurrentProject.SaveProject()
+
+		if err != nil {
+			fmt.Printf("%+v", reflect.TypeOf(err))
+			fmt.Println(colors.Red(err))
+		}
+
 		model.CurrentProject.ApplyValues()
+
+		if verbose {
+			fmt.Println("writing updated default config to: ", colors.Green(cfgFile))
+		}
+		err = model.SaveConfig(cfgFile)
+		if err != nil {
+			fmt.Println(colors.Red(err))
+		}
 		if saveWorkDir == false {
 			defer os.RemoveAll(tempDir)
 		}
@@ -375,6 +465,7 @@ func initConfig() {
 		// Search config in home directory with name ".prefab" (without extension).
 		viper.AddConfigPath(filepath.Join(home, ".prefab"))
 		viper.SetConfigName("config.yaml")
+		cfgFile = filepath.Join(home, ".prefab", "config.yaml")
 	}
 
 	if projectDir == "" {
