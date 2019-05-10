@@ -6,3 +6,4 @@
 * Getting started
 * Tutorials
 * Reference
+* FAQ
