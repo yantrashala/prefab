@@ -1,5 +1,6 @@
 # ◤◣ prefab
 A tool to get prefabricated production ready code as a starter for your next adventure.
+---------------------------------------------------------------------------------------
 
 [![Build Status](https://travis-ci.com/yantrashala/prefab.svg?branch=master)](https://travis-ci.com/yantrashala/prefab)
 
