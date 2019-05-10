@@ -60,7 +60,7 @@ TBD: links to documentation and tutorials
 > cd ..
 > go get -d -v
 > go test ./...
-> go run main.go server 
+> go run main.go server
 ```
 
 ### or use the make file locally
@@ -85,7 +85,7 @@ TBD: links to documentation and tutorials
 
 ### or use chokidar for watch and recompile locally
 
-first install chokidar globally (assuming node & npm are alreadt installed)
+first install chokidar globally (assuming node & npm are already installed)
 ```
 > npm install -g chokidar-cli
 ```
