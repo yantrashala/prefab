@@ -3,6 +3,7 @@
 ## Table of contents
 
 * Introduction
+This is a tool to get prefabricated CD pipelines with production ready code as a starter for your next adventure.
 * Getting started
 * Tutorials
 * Reference
@@ -40,4 +41,3 @@ Prefab uses the Go Modules support built into Go 1.12 to build. The easiest is t
 > go run mage.go install
 ```
 If you are a Windows user, substitute the `$HOME` environment variable above with `%USERPROFILE%`.
-
