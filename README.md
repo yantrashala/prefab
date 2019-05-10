@@ -12,7 +12,7 @@ Finally, you can install the prefab source code with go, build the binaries your
 
 ### Install *prefab* as Your Site Generator (Binary Install)
 Use the installation [instructions in the prefab documentation]().
-TBD: steps to get release binary for different plaform
+TBD: steps to get release binary for different platform
 
 ### Build and Install the Binaries from Source (Advanced Install)
 
