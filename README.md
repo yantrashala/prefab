@@ -1,6 +1,7 @@
 # ◤◣ prefab
 
 A tool to get prefabricated production ready code as a starter for your next adventure.
+---------------------------------------------------------------------------------------
 
 [![Build Status](https://travis-ci.com/yantrashala/prefab.svg?branch=master)](https://travis-ci.com/yantrashala/prefab)
 
@@ -10,7 +11,7 @@ If you want to use prefab as your app generator, simply install the prefab binar
 
 To contribute to the prefab source code or documentation, you should fork the prefab GitHub project and clone it to your local machine.
 
-Finally, you can install the prefab source code with go, build the binaries yourself, and run prefab that way. Building the binaries is an easy task for an experienced go getter.
+Finally, you can install the prefab source code with Go(programming language), build the binaries yourself, and run prefab that way. Building the binaries is an easy task for an experienced go getter.
 
 ### Install _prefab_ as Your Site Generator (Binary Install)
 
@@ -41,6 +42,7 @@ If you are a Windows user, substitute the `$HOME` environment variable above wit
 ## The _prefab_ Documentation
 
 TBD: links to documentation and tutorials
+Docker Overview https://www.tutorialspoint.com/docker/docker_overview.htm
 
 ## Getting started for _prefab_ Developers
 
@@ -95,7 +97,7 @@ TBD: links to documentation and tutorials
 
 ### or use chokidar for watch and recompile locally
 
-first install chokidar globally (assuming node & npm are alreadt installed)
+first install chokidar globally (assuming node & npm are already installed)
 
 ```
 > npm install -g chokidar-cli
@@ -127,3 +129,4 @@ first install chokidar globally (assuming node & npm are alreadt installed)
 5. Commit your changes (git commit -m 'Add some feature')
 6. Push to the branch (git push origin my-new-feature)
 7. Create new pull request
+8. Wait it to get reviewed and merged
