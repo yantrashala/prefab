@@ -16,6 +16,7 @@ Finally, you can install the prefab source code with Go(programming language), b
 ### Install _prefab_ as Your Site Generator (Binary Install)
 
 Use the installation [instructions in the prefab documentation](https://github.com/yantrashala/prefab/blob/master/README.md#the-prefab-documentation).
+
 TBD: steps to get release binary for different plaform
 
 ### Build and Install the Binaries from Source (Advanced Install)
