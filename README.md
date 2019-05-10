@@ -8,7 +8,7 @@ If you want to use prefab as your app generator, simply install the prefab binar
 
 To contribute to the prefab source code or documentation, you should fork the prefab GitHub project and clone it to your local machine.
 
-Finally, you can install the prefab source code with go, build the binaries yourself, and run prefab that way. Building the binaries is an easy task for an experienced go getter.
+Finally, you can install the prefab source code with Go(programming language), build the binaries yourself, and run prefab that way. Building the binaries is an easy task for an experienced go getter.
 
 ### Install *prefab* as Your Site Generator (Binary Install)
 Use the installation [instructions in the prefab documentation]().
@@ -18,7 +18,7 @@ TBD: steps to get release binary for different plaform
 
 #### Prerequisite Tools
 * [git client](https://git-scm.com/)
-* [Go (tested with 1.12)](https://goland.org/dl)
+* [Go (tested with 1.12)](https://golang.org/dl)
 
 #### Fetch from GitHub
 Prefab uses the Go Modules support built into Go 1.12 to build. The easiest is to clone prefab in a directory outside of GOPATH, as in the following example:
