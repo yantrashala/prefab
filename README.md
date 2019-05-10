@@ -18,7 +18,7 @@ TBD: steps to get release binary for different plaform
 
 #### Prerequisite Tools
 * [git client](https://git-scm.com/)
-* [Go (tested with 1.12)](https://golang.org/dl)
+* [Go (at least Go 1.11)](https://golang.org/dl/)
 
 #### Fetch from GitHub
 Prefab uses the Go Modules support built into Go 1.12 to build. The easiest is to clone prefab in a directory outside of GOPATH, as in the following example:
@@ -60,7 +60,7 @@ TBD: links to documentation and tutorials
 > cd ..
 > go get -d -v
 > go test ./...
-> go run main.go server 
+> go run main.go server
 ```
 
 ### or use the make file locally
@@ -85,7 +85,7 @@ TBD: links to documentation and tutorials
 
 ### or use chokidar for watch and recompile locally
 
-first install chokidar globally (assuming node & npm are alreadt installed)
+first install chokidar globally (assuming node & npm are already installed)
 ```
 > npm install -g chokidar-cli
 ```
@@ -113,3 +113,4 @@ first install chokidar globally (assuming node & npm are alreadt installed)
 5. Commit your changes (git commit -m 'Add some feature')
 6. Push to the branch (git push origin my-new-feature)
 7. Create new pull request
+8. Wait it to get reviewed and merged
