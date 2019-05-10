@@ -114,3 +114,4 @@ first install chokidar globally (assuming node & npm are already installed)
 5. Commit your changes (git commit -m 'Add some feature')
 6. Push to the branch (git push origin my-new-feature)
 7. Create new pull request
+8. Wait it to get reviewed and merged
