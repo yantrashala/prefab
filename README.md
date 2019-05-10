@@ -85,7 +85,7 @@ TBD: links to documentation and tutorials
 
 ### or use chokidar for watch and recompile locally
 
-first install chokidar globally (assuming node & npm are alreadt installed)
+first install chokidar globally (assuming node & npm are already installed)
 ```
 > npm install -g chokidar-cli
 ```
