@@ -3,10 +3,17 @@ A tool to get prefabricated production ready code as a starter for your next adv
 
 [![Build Status](https://travis-ci.com/yantrashala/prefab.svg?branch=master)](https://travis-ci.com/yantrashala/prefab)
 
-## Choose How to Install
-If you want to use prefab as your app generator, simply install the prefab binaries. The prefab binaries have no external dependencies.
+## Prerequisites
+* [git client](https://git-scm.com/)
+* [Docker 17.05 or later](https://www.docker.com/)
 
-To contribute to the prefab source code or documentation, you should fork the prefab GitHub project and clone it to your local machine.
+> Optionally for local development
+>* [go 1.11 or later](https://golang.org/dl)
+>* [node v11 or later](https://nodejs.org)
+
+
+## Steps to Install
+If you want to use prefab as your app generator, simply install the prefab binaries. The prefab binaries have no external dependencies.
 
 Finally, you can install the prefab source code with go, build the binaries yourself, and run prefab that way. Building the binaries is an easy task for an experienced go getter.
 
@@ -97,15 +104,10 @@ first install chokidar globally (assuming node & npm are alreadt installed)
 ...
 ```
 
-## Prerequisites
-* [git client](https://git-scm.com/)
-* [Docker 17.05 or later](https://www.docker.com/)
-
-> Optionally for local development
->* [go 1.11 or later](https://golang.org/dl)
->* [node v11 or later](https://nodejs.org)
-
 ## Contributing
+
+To contribute to the prefab source code or documentation, you should fork the prefab GitHub project and clone it to your local machine.
+
 1. Fork it
 2. Download your fork to your PC (git clone https://github.com/your_username/prefab && cd prefab)
 3. Create your feature branch (git checkout -b my-new-feature)
