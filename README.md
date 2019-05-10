@@ -18,7 +18,7 @@ TBD: steps to get release binary for different plaform
 
 #### Prerequisite Tools
 * [git client](https://git-scm.com/)
-* [Go (tested with 1.12)](https://goland.org/dl)
+* [go 1.11 or later](https://golang.org/dl)
 
 #### Fetch from GitHub
 Prefab uses the Go Modules support built into Go 1.12 to build. The easiest is to clone prefab in a directory outside of GOPATH, as in the following example:
@@ -60,7 +60,7 @@ TBD: links to documentation and tutorials
 > cd ..
 > go get -d -v
 > go test ./...
-> go run main.go server 
+> go run main.go server
 ```
 
 ### or use the make file locally
