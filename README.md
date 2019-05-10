@@ -20,8 +20,9 @@ TBD: steps to get release binary for different plaform
 * [git client](https://git-scm.com/)
 * [Go (at least Go 1.11)](https://golang.org/dl/)
 
+
 #### Fetch from GitHub
-Prefab uses the Go Modules support built into Go 1.11 to build. The easiest is to clone prefab in a directory outside of GOPATH, as in the following example:
+Prefab uses the Go Modules support built into Go 1.12 to build. The easiest is to clone prefab in a directory outside of GOPATH, as in the following example:
 
 ```
 > mkdir $HOME/src
@@ -60,7 +61,7 @@ TBD: links to documentation and tutorials
 > cd ..
 > go get -d -v
 > go test ./...
-> go run main.go server 
+> go run main.go server
 ```
 
 ### or use the make file locally
@@ -85,7 +86,7 @@ TBD: links to documentation and tutorials
 
 ### or use chokidar for watch and recompile locally
 
-first install chokidar globally (assuming node & npm are alreadt installed)
+first install chokidar globally (assuming node & npm are already installed)
 ```
 > npm install -g chokidar-cli
 ```

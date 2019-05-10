@@ -14,8 +14,11 @@
 
 package main
 
-import "github.com/yantrashala/prefab/cmd"
+import (
+	"github.com/yantrashala/prefab/cmd"
+)
 
 func main() {
+
 	cmd.Execute()
 }

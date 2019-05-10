@@ -24,7 +24,7 @@ const (
 	noGitLdflags = "-X $PACKAGE/common/prefab.buildDate=$BUILD_DATE"
 )
 
-var ldflags = "-X $PACKAGE/common/prefab.commitHash=$COMMIT_HASH -X $PACKAGE/common/prefab.buildDate=$BUILD_DATE"
+var ldflags = `-X "$PACKAGE/cmd.commitHash=$COMMIT_HASH" -X "$PACKAGE/cmd.buildDate=$BUILD_DATE"`
 
 // allow user to override go executable by running as GOEXE=xxx make ... on unix-like systems
 var goexe = "go"
@@ -73,6 +73,7 @@ func buildTags() string {
 // Build prefab binary
 func Prefab() error {
 	mg.Deps(Get)
+	fmt.Println("Building prefab...")
 	return sh.RunWith(flagEnv(), goexe, "build", "-ldflags", ldflags, "-tags", buildTags(), "-o", "./bin/fab", packageName)
 }
 
