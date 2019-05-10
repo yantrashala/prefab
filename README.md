@@ -106,7 +106,7 @@ first install chokidar globally (assuming node & npm are alreadt installed)
 >* [node v11 or later](https://nodejs.org)
 
 ## Contributing
-1. Fork it
+1. Login with your user credentials and then Fork it
 2. Download your fork to your PC (git clone https://github.com/your_username/prefab && cd prefab)
 3. Create your feature branch (git checkout -b my-new-feature)
 4. Make changes and add them (git add .)
